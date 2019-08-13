@@ -130,7 +130,7 @@ def random10(bot, update):
     )
 if __name__ == '__main__':
     logger.info("Starting bot")
-    updater = Updater(token=BOT_KEY)
+    updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
     leerJugadores()
 
