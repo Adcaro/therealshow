@@ -9,8 +9,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger('AchicaynaBot')
 
 # Getting mode, so we could define run function for local and Heroku setup
-mode = BOT_MODE
-TOKEN = BOT_KEY
+mode = os.environ.get(BOT_MODE)
+TOKEN = os.environ.get(BOT_KEY)
 if mode == "dev":
     def run(updater):
         updater.start_polling()
