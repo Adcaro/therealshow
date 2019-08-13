@@ -125,7 +125,8 @@ def stats(bot, update):
         textStat = textStat + j[0].text + "\n Goles : " + j[1].text + "\t Asist: " + j[2].text + "\n"
     bot.send_message(
         chat_id=update.message.chat_id,
-        text=textStat
+        text=textStat,
+        parse_mode=telegram.ParseMode.MARKDOWN
     )
 #Comando para dar un numero aleatorio entre 1 y 10
 def random10(bot, update):
