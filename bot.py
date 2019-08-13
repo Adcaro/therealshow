@@ -38,7 +38,7 @@ class Jugador(object):
     '''
 
 
-    def __init__(n, g, a, ga, pe):
+    def __init__(self, n, g, a, ga, pe):
         '''
         Constructor
         '''
