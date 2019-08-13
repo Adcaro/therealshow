@@ -49,9 +49,6 @@ class Jugador(object):
         self.ganados = ga
         self.perdidos = pe
 
-    def getNombre(self):
-        return str(self.nombre)
-
 #Metodo para leer jugadores y sus estadisticas
 def leerJugadores():
 
@@ -119,10 +116,14 @@ def addStatJugador(nombre, goles, asistencias, gano):
 #Comando para mostrar las stats
 def stats(bot, update):
     logger.info('He recibido un comando stats')
+    with open('stats.xml', 'r', encoding='latin-1') as utf8_file:
+        tree = ET.parse(utf8_file)
+    root = tree.getroot()
+    jugadores = root.findall('jugador')
     for j in jugadores:
         bot.send_message(
             chat_id=update.message.chat_id,
-            text=""+ Jugador.getNombre(j) + " : "
+            text=""+ str(j.nombre) + " : " str(j.goles)
         )
 #Comando para dar un numero aleatorio entre 1 y 10
 def random10(bot, update):

@@ -6,4 +6,32 @@
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
 	</jugador>
+	<jugador>
+		<nombre>Bane</nombre>
+		<goles>22</goles>
+		<asistencias>17</asistencias>
+		<ganados>4</ganados>
+		<perdidos>2</perdidos>
+	</jugador>
+	<jugador>
+		<nombre>Guille</nombre>
+		<goles>22</goles>
+		<asistencias>17</asistencias>
+		<ganados>4</ganados>
+		<perdidos>2</perdidos>
+	</jugador>
+	<jugador>
+		<nombre>Joche</nombre>
+		<goles>22</goles>
+		<asistencias>17</asistencias>
+		<ganados>4</ganados>
+		<perdidos>2</perdidos>
+	</jugador>
+	<jugador>
+		<nombre>Zamo</nombre>
+		<goles>22</goles>
+		<asistencias>17</asistencias>
+		<ganados>4</ganados>
+		<perdidos>2</perdidos>
+	</jugador>
 </therealshow>
