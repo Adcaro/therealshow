@@ -1,6 +1,7 @@
 
 # This file contains the source code of The Real Show Telegram Bot.
-from telegram.ext import Updater, CommandHandler, ParseMode
+from telegram.ext import Updater, CommandHandler
+from telegram import ParseMode
 import xml.etree.ElementTree as ET
 import random
 import logging
