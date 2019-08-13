@@ -5,9 +5,10 @@ import xml.etree.ElementTree as ET
 import random
 import logging
 import os
+import sys
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-logger = logging.getLogger('AchicaynaBot')
+logger = logging.getLogger('TheRealShow')
 
 # Getting mode, so we could define run function for local and Heroku setup
 mode = os.environ.get("BOT_MODE")
@@ -132,7 +133,7 @@ if __name__ == '__main__':
     logger.info("Starting bot")
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
-    leerJugadores()
+    leerJugadores(jugadores)
 
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('rand', random10))
