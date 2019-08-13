@@ -1,6 +1,6 @@
 
 # This file contains the source code of The Real Show Telegram Bot.
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, ParseMode
 import xml.etree.ElementTree as ET
 import random
 import logging
@@ -113,6 +113,13 @@ def addStatJugador(nombre, goles, asistencias, gano):
 
 
 #Comandos del bot
+#Comando de inicio del Bot
+def start(bot, update):
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="textStat",
+        parse_mode=telegram.ParseMode.MARKDOWN
+    )
 #Comando para mostrar las stats
 def stats(bot, update):
     logger.info('He recibido un comando stats')
@@ -126,7 +133,7 @@ def stats(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
         text=textStat,
-        parse_mode=telegram.ParseMode.MARKDOWN
+        parse_mode= ParseMode.MARKDOWN
     )
 #Comando para dar un numero aleatorio entre 1 y 10
 def random10(bot, update):
@@ -142,6 +149,7 @@ if __name__ == '__main__':
     leerJugadores()
 
     dispatcher.add_handler(CommandHandler('stats', stats))
+    dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('rand', random10))
 
     run(updater)
