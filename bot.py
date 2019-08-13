@@ -4,6 +4,7 @@ from telegram.ext import Updater, CommandHandler
 import xml.etree.ElementTree as ET
 import random
 import logging
+import os
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('AchicaynaBot')
