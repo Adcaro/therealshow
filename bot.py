@@ -120,11 +120,14 @@ def stats(bot, update):
         tree = ET.parse(utf8_file)
     root = tree.getroot()
     jugadores = root.findall('jugador')
+    textStat = "*Stats The Real Show PreSeason*\n"
     for j in jugadores:
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text=""+ j[0].text + " : " + j[1].text
-        )
+        textStat = textStat + j[0].text + "\n Goles : " + j[1].text + "\t Asist: "
+        + j[2] + "\n"
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text=textStat
+    )
 #Comando para dar un numero aleatorio entre 1 y 10
 def random10(bot, update):
     num = random.randint(1, 10)
