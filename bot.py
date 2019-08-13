@@ -107,7 +107,7 @@ def random10(bot, update):
     )
 if __name__ == '__main__':
 
-    updater = Updater(token='972279291:AAEwQneDELh1vIAX139guPhiv1Qw6sd-It8')
+    updater = Updater(token=BOT_KEY)
     dispatcher = updater.dispatcher
     leerJugadores()
 
