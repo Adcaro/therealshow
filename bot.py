@@ -123,7 +123,7 @@ def stats(bot, update):
     textStat = "*Stats The Real Show PreSeason*\n"
     for j in jugadores:
         textStat = textStat + j[0].text + "\n Goles : " + j[1].text + "\t Asist: "
-        + j[2] + "\n"
+        + j[2].text + "\n"
     bot.send_message(
         chat_id=update.message.chat_id,
         text=textStat
