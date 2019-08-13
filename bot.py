@@ -65,9 +65,11 @@ def leerJugadores():
             asistencias = jugador[2].text
             ganados = jugador[3].text
             perdidos = jugador[4].text
-
+            '''
+            Pendiente de modificar
             jugador = Jugador(nombre, goles, asistencias, ganados, perdidos)
             jugadores[nombre] = jugador
+            '''
 
 #Metodo para introducir un jugador
 def introducirJugador(nombre, goles, asistencias, ganados, perdidos):
@@ -133,7 +135,7 @@ if __name__ == '__main__':
     logger.info("Starting bot")
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
-    leerJugadores(jugadores)
+    leerJugadores()
 
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('rand', random10))
