@@ -123,7 +123,7 @@ def stats(bot, update):
     for j in jugadores:
         bot.send_message(
             chat_id=update.message.chat_id,
-            text=""+ str(j.nombre) + " : " str(j.goles)
+            text=""+ str(j.nombre) + " : " + str(j.goles)
         )
 #Comando para dar un numero aleatorio entre 1 y 10
 def random10(bot, update):
