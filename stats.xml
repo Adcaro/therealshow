@@ -5,13 +5,17 @@
 		<asistencias>17</asistencias>
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
+		<nick>Adri</nick>
+		<img>Fran.png<img>
 	</jugador>
 	<jugador>
-		<nombre>Bane</nombre>
+		<nombre>Cristian</nombre>
 		<goles>22</goles>
 		<asistencias>17</asistencias>
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
+		<nick>Cristian</nick>
+		<img>Fran.png<img>
 	</jugador>
 	<jugador>
 		<nombre>Guille</nombre>
@@ -19,6 +23,8 @@
 		<asistencias>17</asistencias>
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
+		<nick>Guille</nick>
+		<img>Fran.png<img>
 	</jugador>
 	<jugador>
 		<nombre>Joche</nombre>
@@ -26,6 +32,8 @@
 		<asistencias>17</asistencias>
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
+		<nick>Joche</nick>
+		<img>Fran.png<img>
 	</jugador>
 	<jugador>
 		<nombre>Zamo</nombre>
@@ -33,5 +41,16 @@
 		<asistencias>17</asistencias>
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
+		<nick>Zamo</nick>
+		<img>Fran.png<img>
+	</jugador>
+		<jugador>
+		<nombre>Fran</nombre>
+		<goles>12</goles>
+		<asistencias>17</asistencias>
+		<ganados>4</ganados>
+		<perdidos>2</perdidos>
+		<nick>Fran</nick>
+		<img>Fran.png<img>
 	</jugador>
 </therealshow>

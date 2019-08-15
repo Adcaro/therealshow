@@ -38,9 +38,7 @@ class Jugador(object):
     '''
     classdocs
     '''
-
-
-    def __init__(self, n, g, a, ga, pe):
+    def __init__(self, n, g, a, ga, pe, ni):
         '''
         Constructor
         '''
@@ -49,6 +47,7 @@ class Jugador(object):
         self.asistencias = a
         self.ganados = ga
         self.perdidos = pe
+        self.nick = ni
 
 #Metodo para leer jugadores y sus estadisticas
 def leerJugadores():
@@ -143,14 +142,33 @@ def random10(bot, update):
         chat_id = update.message.chat_id,
         text="Este es el número aleatorio entre el 1 y el 10:\t" + str(num)
     )
+#Comando para mostrar informacion especifica sobre un jugador
+def myStats(bot, update):
+    logger.info('He recibido un comando MyStats de {}'.format (update.message.from_user.first_name))
+    with open('stats.xml', 'r', encoding='latin-1') as utf8_file:
+        tree = ET.parse(utf8_file)
+    root = tree.getroot()
+    jugadores = root.findall('jugador')
+    for j in jugadores:
+        if(j[5].text == update.message.from_user.first_name):
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text=j[0].text + "\n Goles : " + j[1].text + "\t Asist: " + j[2].text + "\t P. Ganados: " +j[3].text + "\t P. Perdidos: " + j[4].text + "\n",
+                parse_mode= ParseMode.MARKDOWN
+            )
+            bot.send_photo(chat_id=update.message.chat_id, photo=open(j[6].text, 'rb'))
+            break
+
+#Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
     leerJugadores()
 
-    dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('rand', random10))
+    dispatcher.add_handler(CommandHandler('myStats', myStats))
 
     run(updater)
