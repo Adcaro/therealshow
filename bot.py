@@ -8,12 +8,46 @@ import logging
 import os
 import sys
 
+#Clase partido
+class Partido(object):
+    '''
+    classdocs
+    '''
+    def __init__(self):
+        '''
+        Constructor
+        '''
+        self.tematica = ""
+        self.participantes = dict()
+        self.fecha = ""
+        self.lugar = ""
+        self.idMensaje = ""
+        self.texto = ""
+        self.activo = False
+#clase de jugador
+class Jugador(object):
+    '''
+    classdocs
+    '''
+    def __init__(self, n, g, a, ga, pe, ni):
+        '''
+        Constructor
+        '''
+        self.nombre = n
+        self.goles = g
+        self.asistencias = a
+        self.ganados = ga
+        self.perdidos = pe
+        self.nick = ni
+#
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('TheRealShow')
+partido = Partido()
 
 # Getting mode, so we could define run function for local and Heroku setup
 mode = os.environ.get("BOT_MODE")
 TOKEN = os.environ.get("BOT_KEY")
+
 if mode == "dev":
     def run(updater):
         updater.start_polling()
@@ -31,23 +65,6 @@ elif mode == "prod":
 else:
     logger.error("No MODE specified!")
     sys.exit(1)
-
-
-#clase de jugador
-class Jugador(object):
-    '''
-    classdocs
-    '''
-    def __init__(self, n, g, a, ga, pe, ni):
-        '''
-        Constructor
-        '''
-        self.nombre = n
-        self.goles = g
-        self.asistencias = a
-        self.ganados = ga
-        self.perdidos = pe
-        self.nick = ni
 
 #Metodo para leer jugadores y sus estadisticas
 def leerJugadores():
@@ -111,13 +128,13 @@ def addStatJugador(nombre, goles, asistencias, gano):
     tree.write('stats.xml')
 
 
-
 #Comandos del bot
+#-----------------------------------------------------------------
 #Comando de inicio del Bot
 def start(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="textStat",
+        text="Iniciando Bot, leyendo datos...",
         parse_mode=telegram.ParseMode.MARKDOWN
     )
 #Comando para mostrar las stats
@@ -158,7 +175,60 @@ def myStats(bot, update):
             )
             bot.send_photo(chat_id=update.message.chat_id, photo=open(j[6].text, 'rb'))
             break
-
+#Comando para iniciar un partido
+def crearPartido(bot, update, args):
+    logger.info('He recibido un comando CrearPartido de {}'.format (update.message.from_user.first_name))
+    admins = bot.get_chat_administrators(update.message.chat_id, timeout=None)
+    user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
+    if(user in admins):
+        logger.info('Usuario valido para generar partido')
+        if(len(args) == 0):
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text="La creación de un partido requiere una temática.",
+                parse_mode= ParseMode.MARKDOWN
+            )
+        else:
+            tematica = ""
+            for p in args:
+                tematica = tematica + p + " "
+            partido.tematica = tematica
+            partido.texto = "⚽ " + "*" + tematica + "*" + "⚽"
+            mensaje_Partido = bot.send_message(
+                chat_id=update.message.chat_id,
+                text=partido.texto,
+                parse_mode= ParseMode.MARKDOWN,
+            )
+            partido.mensaje = mensaje_Partido
+            partido.idMensaje = mensaje_Partido.message_id
+            bot.pin_chat_message(chat_id=update.message.chat_id, message_id = partido.idMensaje, disable_notification=None, timeout=None)
+        #pinned_message
+        #bot.delete_message(chat_id=message.chat_id, message_id=message.message_id)
+        #
+        #'''bot.edit_text(chat_id=message.chat_id,
+        #                 message_id=message.message_id)'''
+        #
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="@" + update.message.from_user.username + " no tienes permiso para crear una Convocatoria de Partido.",
+            parse_mode= ParseMode.MARKDOWN
+        )
+#Comando para apuntarse a un Partido
+def apuntarsePartido(bot, update, args):
+    tematicaJugador = ""
+    for p in args:
+        tematicaJugador = tematicaJugador + p + " "
+    if (tematicaJugador in partido.participantes.values()):
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="@" + update.message.from_user.username + " ya existe un nombre identico para esta temática.",
+            parse_mode= ParseMode.MARKDOWN
+        )
+    else:
+        partido.participantes[update.message.from_user.username] = tematicaJugador
+        partido.texto = partido.texto + "\n - " + tematicaJugador + "\t @" + update.message.from_user.username
+        partido.mensaje.edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
 #Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -170,5 +240,7 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('rand', random10))
     dispatcher.add_handler(CommandHandler('myStats', myStats))
+    dispatcher.add_handler(CommandHandler('crearPartido', crearPartido, pass_args=True))
+    dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
 
     run(updater)
