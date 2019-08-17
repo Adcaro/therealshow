@@ -6,7 +6,7 @@
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
 		<nick>Adri</nick>
-		<img>Fran.png<img>
+		<img>Fran.png</img>
 	</jugador>
 	<jugador>
 		<nombre>Cristian</nombre>
@@ -15,7 +15,7 @@
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
 		<nick>Cristian</nick>
-		<img>Fran.png<img>
+		<img>Fran.png</img>
 	</jugador>
 	<jugador>
 		<nombre>Guille</nombre>
@@ -24,7 +24,7 @@
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
 		<nick>Guille</nick>
-		<img>Fran.png<img>
+		<img>Fran.png</img>
 	</jugador>
 	<jugador>
 		<nombre>Joche</nombre>
@@ -33,7 +33,7 @@
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
 		<nick>Joche</nick>
-		<img>Fran.png<img>
+		<img>Fran.png</img>
 	</jugador>
 	<jugador>
 		<nombre>Zamo</nombre>
@@ -42,7 +42,7 @@
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
 		<nick>Zamo</nick>
-		<img>Fran.png<img>
+		<img>Fran.png</img>
 	</jugador>
 		<jugador>
 		<nombre>Fran</nombre>
@@ -51,6 +51,6 @@
 		<ganados>4</ganados>
 		<perdidos>2</perdidos>
 		<nick>Fran</nick>
-		<img>Fran.png<img>
+		<img>Fran.png</img>
 	</jugador>
 </therealshow>
