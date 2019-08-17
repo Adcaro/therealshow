@@ -239,8 +239,8 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('rand', random10))
-    dispatcher.add_handler(CommandHandler('myStats', myStats))
-    dispatcher.add_handler(CommandHandler('crearPartido', crearPartido, pass_args=True))
+    dispatcher.add_handler(CommandHandler('mystats', myStats))
+    dispatcher.add_handler(CommandHandler('crearpartido', crearPartido, pass_args=True))
     dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
 
     run(updater)
