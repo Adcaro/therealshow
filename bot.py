@@ -216,19 +216,26 @@ def crearPartido(bot, update, args):
         )
 #Comando para apuntarse a un Partido
 def apuntarsePartido(bot, update, args):
-    tematicaJugador = ""
-    for p in args:
-        tematicaJugador = tematicaJugador + p + " "
-    if (tematicaJugador in partido.participantes.values()):
+    if(len(args) == 0):
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="@" + update.message.from_user.username + " ya existe un nombre identico para esta temática.",
+            text="Para apuntarte al partido tienes que poner en el mensaje un nombre.",
             parse_mode= ParseMode.MARKDOWN
         )
     else:
-        partido.participantes[update.message.from_user.username] = tematicaJugador
-        partido.texto = partido.texto + "\n - " + tematicaJugador + "\t @" + update.message.from_user.username
-        partido.mensaje.edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
+        tematicaJugador = ""
+        for p in args:
+            tematicaJugador = tematicaJugador + p + " "
+        if (tematicaJugador in partido.participantes.values()):
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text="@" + update.message.from_user.username + " ya existe un nombre identico para esta temática.",
+                parse_mode= ParseMode.MARKDOWN
+            )
+        else:
+            partido.participantes[update.message.from_user.username] = tematicaJugador
+            partido.texto = partido.texto + "\n - " + tematicaJugador + "\t @" + update.message.from_user.username
+            partido.mensaje.edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
 #Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
