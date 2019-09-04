@@ -9,41 +9,8 @@ import os
 import sys
 import sqlite3
 
-#Clase partido
-class Partido(object):
-    '''
-    classdocs
-    '''
-    def __init__(self):
-        '''
-        Constructor
-        '''
-        self.tematica = ""
-        self.participantes = dict()
-        self.fecha = ""
-        self.lugar = ""
-        self.idMensaje = ""
-        self.texto = ""
-        self.activo = False
-#clase de jugador
-class Jugador(object):
-    '''
-    classdocs
-    '''
-    def __init__(self, n, g, a, ga, pe, ni):
-        '''
-        Constructor
-        '''
-        self.nombre = n
-        self.goles = g
-        self.asistencias = a
-        self.ganados = ga
-        self.perdidos = pe
-        self.nick = ni
-#
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('TheRealShow')
-partido = Partido()
 
 #-------------------------------------------------------------------CHANGE---------------------------------------------------------------------------------------------------
 # Getting mode, so we could define run function for local and Heroku setup
@@ -68,68 +35,6 @@ elif mode == "prod":
 else:
     logger.error("No MODE specified!")
     sys.exit(1)
-
-#Metodo para leer jugadores y sus estadisticas
-def leerJugadores():
-
-        # parse an xml file by name
-        with open('stats.xml', 'r', encoding='latin-1') as utf8_file:
-            tree = ET.parse('stats.xml')
-
-        for jugador in tree.findall("jugador"):
-            nombre = jugador[0].text
-            goles = jugador[1].text
-            asistencias = jugador[2].text
-            ganados = jugador[3].text
-            perdidos = jugador[4].text
-            '''
-            Pendiente de modificar
-            jugador = Jugador(nombre, goles, asistencias, ganados, perdidos)
-            jugadores[nombre] = jugador
-            '''
-
-#Metodo para introducir un jugador
-def introducirJugador(nombre, goles, asistencias, ganados, perdidos):
-        with open('stats.xml', 'r', encoding='latin-1') as utf8_file:
-            tree = ET.parse(utf8_file)
-        root = tree.getroot()
-        jug = ET.Element("jugador")
-
-        nomb = ET.SubElement(jug, "nombre")
-        nomb.text = nombre
-
-        gol = ET.SubElement(jug, "goles")
-        gol.text = goles
-
-        asist = ET.SubElement(jug, "asistencias")
-        asist.text=asistencias
-
-        gan = ET.SubElement(jug, "ganados")
-        gan.text=ganados
-
-        juga = ET.SubElement(jug, "jugados")
-        juga.text=jugados
-
-        root.insert(1, jug)
-
-        tree.write('stats.xml')
-
-#Metodo para introducir stats de un jugador
-def addStatJugador(nombre, goles, asistencias, gano):
-    with open('stats.xml', 'r', encoding='latin-1') as utf8_file:
-        tree = ET.parse(utf8_file)
-    root = tree.getroot()
-    jugadores = root.findall('jugador')
-    for jugador in jugadores:
-        if(jugador[0].text == nombre):
-            jugador[1].text = str(int(jugador[1].text) +goles)
-            jugador[2].text = str(int(jugador[2].text) +asistencias)
-            if(gano == 1):
-                jugador[3].text = str(int(jugador[3].text) + 1)
-            else:
-                jugador[4].text = str(int(jugador[4].text) + 1)
-    tree.write('stats.xml')
-
 
 #Comandos del bot
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -325,7 +230,6 @@ if __name__ == '__main__':
     logger.info("Starting bot")
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
-    leerJugadores()
 
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('stats', stats))
