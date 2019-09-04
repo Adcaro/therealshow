@@ -290,6 +290,7 @@ def apuntarsePartido(bot, update, args):
                 tematicaJugador = tematicaJugador + p + " "
             #Add participante a partido
             #Extraer mensaje por id
+            '''
             mensajeConvocatoria = update.message(chat_id = chat_id=datosPartido[0][1],
             message_id=datosPartido[0][2])
             
@@ -302,6 +303,7 @@ def apuntarsePartido(bot, update, args):
             partido.participantes[update.message.from_user.username] = tematicaJugador
             partido.texto = partido.texto + "\n - " + tematicaJugador + "\t @" + update.message.from_user.username
             partido.mensaje.edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
+            '''
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Para ver cuan gay estas hoy
 def gay(bot, update):
