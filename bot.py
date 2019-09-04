@@ -290,7 +290,7 @@ def apuntarsePartido(bot, update, args):
                 tematicaJugador = tematicaJugador + p + " "
             #Add participante a partido
             #Extraer mensaje por id
-            mensajeConvocatoria = upsate.message(chat_id = chat_id=datosPartido[0][1],
+            mensajeConvocatoria = update.message(chat_id = chat_id=datosPartido[0][1],
             message_id=datosPartido[0][2])
             
             update.message.from_user.username
