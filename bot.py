@@ -241,7 +241,7 @@ def crearEquipos(bot, update):
     if(update.message.from_user.id == 892752079):
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="PACHRICOLAJE 🔨\n",
+            text="PACHRICOLAJE 🔨\n Equipo BLANCO: \n - Alfredo\n - Urri \n - Guille\n - Cosmin\n - Joche\n\n Equipo COLOR:\n - Joseca\n - Banegas\n - Zamo\n - Fran\n - Pablo",
             parse_mode= ParseMode.MARKDOWN
         )
     else:
