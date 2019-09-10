@@ -209,6 +209,20 @@ def apuntarsePartido(bot, update, args):
             partido.texto = partido.texto + "\n - " + tematicaJugador + "\t @" + update.message.from_user.username
             partido.mensaje.edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
             '''
+#Comando para generar los equipos
+def apuntarsePartido(bot, update):
+    if(update.message.from_user.id == 892752079):
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="PACHRICOLAJE 🔨\n",
+            parse_mode= ParseMode.MARKDOWN
+        )
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="" + update.message.from_user.username + " no eres el Haceedor de Equipos, no toques.",
+            parse_mode= ParseMode.MARKDOWN
+        )
 #Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -221,5 +235,6 @@ if __name__ == '__main__':
 #------------------------------------------------DEV--------------------------------------------------------------------------------------------------
     dispatcher.add_handler(CommandHandler('crearpartido', crearPartido, pass_args=True))
     dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
+    dispatcher.add_handler(CommandHandler('equipos', crearEquipos))
 
     run(updater)
