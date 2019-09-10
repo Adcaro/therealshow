@@ -115,12 +115,10 @@ def myStats(bot, update):
 #Comando para iniciar un partido
 def crearPartido(bot, update, args):
     logger.info('He recibido un comando CrearPartido de {}'.format (update.message.from_user.first_name))
-    #Extraer la lista de admins del grupo
-    admins = bot.get_chat_administrators(update.message.chat_id, timeout=None)
     #Determinar el usuario
     user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
     #Si el usuario es un administrador
-    if(user in admins):
+    if(user):
         logger.info('Usuario valido para generar partido')
         #Si no se pasan argumentos
         if(len(args) == 0):
@@ -147,9 +145,9 @@ def crearPartido(bot, update, args):
                 parse_mode= ParseMode.MARKDOWN,
             )
             #Recopilamos la informacion del partido
-            valoresPartido = (tematica, update.message.chat_id, mensaje_Partido.message_id, update.message.from_user.id, True)
+            valoresPartido = (tematica, update.message.chat_id, mensaje_Partido.message_id)
             #Realizamos la insercción en la tabla
-            cursorObj.execute('INSERT INTO partido(tematica, idchat, idmensaje, creador, activo) VALUES(?, ?, ?, ?, ?)', valoresPartido)
+            cursorObj.execute('INSERT INTO partido(tematica, idchat, idmensaje) VALUES(?, ?, ?)', valoresPartido)
             #Completamos la modificacion
             con.commit()
             #Cerrar conexion
@@ -159,7 +157,7 @@ def crearPartido(bot, update, args):
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="@" + str(update.message.from_user.username) + " no tienes permiso para crear una Convocatoria de Partido.",
+            text="@" + str(update.message.from_user.username) + " solo el Convocator puede convocar sucio humano.",
             parse_mode= ParseMode.MARKDOWN
         )
 #Comando para apuntarse a un Partido
@@ -167,7 +165,7 @@ def apuntarsePartido(bot, update, args):
     if(len(args) == 0):
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="Para apuntarte al partido tienes que poner en el mensaje un nombre.",
+            text="Para apuntarte al partido tienes que poner, a continuación del comando, un nombre.",
             parse_mode= ParseMode.MARKDOWN
         )
     else:
@@ -177,7 +175,7 @@ def apuntarsePartido(bot, update, args):
         #Creamos un cursor
         cursorObj = con.cursor()
         #Consulta para sacar las stats de un jugador
-        cursorObj.execute('SELECT tematica, idchat, idmensaje, creador, activo FROM partido WHERE activo IS 1 AND idchat IS {}'.format(update.message.chat_id))
+        cursorObj.execute('SELECT tematica, idchat, idmensaje FROM partido WHERE idchat IS {}'.format(update.message.chat_id))
         #Samos todas las columnas de la consulta
         datosPartido = cursorObj.fetchall()
         #Cerrar la conexion SQL
@@ -185,7 +183,7 @@ def apuntarsePartido(bot, update, args):
         if(not datosPartido):
             bot.send_message(
                 chat_id=update.message.chat_id,
-                text="" + update.message.from_user.username + " no hay partidos activos, si eres admin puedes convocar uno.",
+                text="" + update.message.from_user.username + " no hay partidos activos, si eres el Convocador puedes convocar uno.",
                 parse_mode= ParseMode.MARKDOWN
             )
         else:
@@ -193,24 +191,52 @@ def apuntarsePartido(bot, update, args):
             tematicaJugador = ""
             for p in args:
                 tematicaJugador = tematicaJugador + p + " "
-            #Add participante a partido
-            #Extraer mensaje por id
-            '''
-            mensajeConvocatoria = update.message(chat_id = chat_id=datosPartido[0][1],
-            message_id=datosPartido[0][2])
-            
-            update.message.from_user.username
-            bot.edit_message_text(chat_id=datosPartido[0][1],
-                      message_id=datosPartido[0][2],
-                      text=
-                      parse_mode= ParseMode.MARKDOWN)
-            edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
-            partido.participantes[update.message.from_user.username] = tematicaJugador
-            partido.texto = partido.texto + "\n - " + tematicaJugador + "\t @" + update.message.from_user.username
-            partido.mensaje.edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
-            '''
+            #Add jugador
+            #Abrir conexion sql
+            con = sqlite3.connect('therealshow.db')
+            #Creamos un cursor
+            cursorObj = con.cursor()
+            #Consulta para sacar las stats de un jugador
+            cursorObj.execute('SELECT jugadores, nombres, idmensaje, id WHERE idchat IS {}'.format(update.message.chat_id))
+            #Samos todas las columnas de la consulta
+            sacarJugadores = cursorObj.fetchall()
+            #Cerrar la conexion SQL
+            con.close()
+            #Extraer jugadores
+            idJugadores = sacarJugadores [0]
+            nombreJugadores = sacarJugadores[1]
+            idMensajeAnclado = sacarJugadores[2]
+            li = list(idJugadores.split("~"))
+            if(update.message.from_user.id in listaIdJugadores):
+                nombreTematica = ""
+                for p in args:
+                    nombreTematica = nombreTematica + p + " "
+                bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text="" + update.message.from_user.username + " ya estas apuntado a esta convocatoria.",
+                    parse_mode= ParseMode.MARKDOWN
+                )
+            else:
+                nombreJugadores = nombreJugadores + "~" + nombreTematica
+                idJugadores = idJugadores + "~" + update.message.from_user.id
+                bot.edit_message_text(chat_id=update.message.chat_id,
+                    message_id=idMensajeAnclado,
+                    text=update.message.text + "\n -" + nombreTematica
+                    parse_mode= ParseMode.MARKDOWN)
+                #Abrir conexion sql
+                con = sqlite3.connect('therealshow.db')
+                #Creamos un cursor
+                cursorObj = con.cursor()
+                #Usamos el id del partido
+                sacarJugadores
+                #Consulta para sacar las stats de un jugador
+                cursorObj.execute('UPDATE partido SET jugadores = {} WHERE id IS {}'.format(update.message.chat_id, sacarJugadores[3]))
+                #Hacer un commit
+                con.commit()
+                #Cerrar la conexion SQL
+                con.close()
 #Comando para generar los equipos
-def apuntarsePartido(bot, update):
+def crearEquipos(bot, update):
     if(update.message.from_user.id == 892752079):
         bot.send_message(
             chat_id=update.message.chat_id,
