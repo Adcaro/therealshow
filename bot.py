@@ -219,7 +219,7 @@ def apuntarsePartido(bot, update, args):
                 )
             else:
                 nombreJugadores = nombreJugadores + "~" + nombreTematica
-                idJugadores = idJugadores + "~" + update.message.from_user.id
+                idJugadores = idJugadores + "~" + str(update.message.from_user.id)
                 bot.edit_message_text(chat_id=update.message.chat_id,
                     message_id=idMensajeAnclado,
                     text=update.message.text + "\n -" + nombreTematica,
