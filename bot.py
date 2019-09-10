@@ -69,7 +69,7 @@ def stats(bot, update):
         parse_mode= ParseMode.MARKDOWN
     )
     #Consulta para sacar los jugadores ordenados por asistencias
-    cursorObj.execute('SELECT nombre, nasistencias FROM jugador ORDER BY nasistencias DESC, pjugados ASC LIMIT 7')
+    cursorObj.execute('SELECT nombre, nasistencias FROM jugador ORDER BY nasistencias DESC, pjugados ASC, pganados DESC LIMIT 7')
     #Samos todas las columnas de la consulta
     datosAsistJugadores = cursorObj.fetchall()
     #Preparar el mensaje
