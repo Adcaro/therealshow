@@ -208,10 +208,10 @@ def apuntarsePartido(bot, update, args):
             nombreJugadores = sacarJugadores[1]
             idMensajeAnclado = sacarJugadores[2]
             listaIdJugadores = list(idJugadores.split("~"))
+            nombreTematica = ""
+            for p in args:
+                nombreTematica = nombreTematica + p + " "
             if(update.message.from_user.id in listaIdJugadores):
-                nombreTematica = ""
-                for p in args:
-                    nombreTematica = nombreTematica + p + " "
                 bot.send_message(
                     chat_id=update.message.chat_id,
                     text="" + update.message.from_user.username + " ya estas apuntado a esta convocatoria.",
