@@ -241,13 +241,13 @@ def crearEquipos(bot, update):
     if(update.message.from_user.id == 892752079):
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="PACHRICOLAJE 🔨\n Equipo BLANCO: \n - Alfredo\n - Urri \n - Guille\n - Cosmin\n - Joche\n\n Equipo COLOR:\n - Joseca\n - Banegas\n - Zamo\n - Fran\n - Pablo",
+            text="\t ⚽️ PACHRICOLAJE 🔨 ⚽️'''\n\n ⚪️ Equipo BLANCO: \n ➖ Alfredo\n ➖ Urri \n ➖ Guille\n ➖ Cosmin\n ➖ Joche\n\n 🔵 Equipo COLOR:\n ➖ Joseca\n ➖ Banegas\n ➖ Zamo\n ➖ Fran\n ➖ Pablo",
             parse_mode= ParseMode.MARKDOWN
         )
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="" + update.message.from_user.username + " no eres el Haceedor de Equipos, no toques.",
+            text="" + update.message.from_user.first_name + " no eres el Haceedor de Equipos, no toques.",
             parse_mode= ParseMode.MARKDOWN
         )
 #Main Function
