@@ -209,22 +209,6 @@ def apuntarsePartido(bot, update, args):
             partido.texto = partido.texto + "\n - " + tematicaJugador + "\t @" + update.message.from_user.username
             partido.mensaje.edit_text( text=partido.texto, parse_mode= ParseMode.MARKDOWN)
             '''
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Para ver cuan gay estas hoy
-def gay(bot, update):
-    num = random.randint(0, 100)
-    bot.send_message(
-        chat_id = update.message.chat_id,
-        text="Este es el número aleatorio entre el 1 y el 10:\t" + str(num)
-    )
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Para ver cuan gay estas hoy
-def showid(bot, update):
-    print("{} ID: \t {}".format(update.message.from_user.first_name, update.message.from_user.id))
-    bot.send_message(
-        chat_id = update.message.chat_id,
-        text="Gracias {}".format(update.message.from_user.first_name)
-    )
 #Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -234,7 +218,7 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('mystats', myStats))
-    dispatcher.add_handler(CommandHandler('id', showid))
+#------------------------------------------------DEV--------------------------------------------------------------------------------------------------
     dispatcher.add_handler(CommandHandler('crearpartido', crearPartido, pass_args=True))
     dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
 
