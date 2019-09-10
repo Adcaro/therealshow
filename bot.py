@@ -203,6 +203,7 @@ def apuntarsePartido(bot, update, args):
             #Cerrar la conexion SQL
             con.close()
             #Extraer jugadores
+            sacarJugadores = sacarJugadores [0]
             idJugadores = sacarJugadores [0]
             nombreJugadores = sacarJugadores[1]
             idMensajeAnclado = sacarJugadores[2]
