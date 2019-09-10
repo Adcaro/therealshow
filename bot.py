@@ -197,7 +197,7 @@ def apuntarsePartido(bot, update, args):
             #Creamos un cursor
             cursorObj = con.cursor()
             #Consulta para sacar las stats de un jugador
-            cursorObj.execute('SELECT jugadores, nombres, idmensaje, id FROM partido WHERE idchat IS {}'.format(update.message.chat_id))
+            cursorObj.execute('SELECT jugadores, tematicas, idmensaje, id FROM partido WHERE idchat IS {}'.format(update.message.chat_id))
             #Samos todas las columnas de la consulta
             sacarJugadores = cursorObj.fetchall()
             #Cerrar la conexion SQL
