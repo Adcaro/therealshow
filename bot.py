@@ -221,7 +221,7 @@ def apuntarsePartido(bot, update, args):
                 idJugadores = idJugadores + "~" + update.message.from_user.id
                 bot.edit_message_text(chat_id=update.message.chat_id,
                     message_id=idMensajeAnclado,
-                    text=update.message.text + "\n -" + nombreTematica
+                    text=update.message.text + "\n -" + nombreTematica,
                     parse_mode= ParseMode.MARKDOWN)
                 #Abrir conexion sql
                 con = sqlite3.connect('therealshow.db')
