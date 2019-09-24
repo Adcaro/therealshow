@@ -241,7 +241,7 @@ def crearEquipos(bot, update):
     if(update.message.from_user.id == 892752079):
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="\t PACHRICOLAJE 🔨\n 🗓 Martes 10 \n 🕑 19:00\n 🏟 UMU\n ⚪️ Equipo BLANCO: \n ➖ Alfredo\n ➖ Urri \n ➖ Guille\n ➖ Cosmin\n ➖ Joche\n\n 🔴 Equipo COLOR:\n ➖ Joseca\n ➖ Banegas\n ➖ Zamo\n ➖ Fran\n ➖ Pablo \n Número de extranjeros: 1 (10/30% alcanzado). \n Pachanga OFICIAL ✅.",
+            text="",
             parse_mode= ParseMode.MARKDOWN
         )
     else:
