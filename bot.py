@@ -260,8 +260,8 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('mystats', myStats))
 #------------------------------------------------DEV--------------------------------------------------------------------------------------------------
-    dispatcher.add_handler(CommandHandler('crearpartido', crearPartido, pass_args=True))
-    dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
+    #dispatcher.add_handler(CommandHandler('crearpartido', crearPartido, pass_args=True))
+    #dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
     dispatcher.add_handler(CommandHandler('equipos', crearEquipos))
 
     run(updater)
