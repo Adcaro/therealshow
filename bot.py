@@ -15,7 +15,7 @@ logger = logging.getLogger('TheRealShow')
 
 #-------------------------------------------------------------------CHANGE---------------------------------------------------------------------------------------------------
 # Getting mode, so we could define run function for local and Heroku setup
-mode = os.environ.get("BOT_MODE")
+MODE = os.environ.get("BOT_MODE")
 TOKEN = os.environ.get("BOT_KEY")
 FTP_USR = os.environ.get("FTPUSR")
 FTP_PASS = os.environ.get("FTPPASS")
