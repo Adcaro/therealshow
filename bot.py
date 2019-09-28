@@ -1,13 +1,14 @@
-
 # This file contains the source code of The Real Show Telegram Bot.
 from telegram.ext import Updater, CommandHandler
 from telegram import ParseMode
+from ftplib import FTP
 import xml.etree.ElementTree as ET
 import random
 import logging
 import os
 import sys
 import sqlite3
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('TheRealShow')
@@ -16,13 +17,15 @@ logger = logging.getLogger('TheRealShow')
 # Getting mode, so we could define run function for local and Heroku setup
 mode = os.environ.get("BOT_MODE")
 TOKEN = os.environ.get("BOT_KEY")
+FTP_USR = os.environ.get("FTPUSR")
+FTP_PASS = os.environ.get("FTPPASS")
 #-------------------------------------------------------------------CHANGE---------------------------------------------------------------------------------------------------
 
-if mode == "dev":
+if MODE == "dev":
     def run(updater):
         updater.start_polling()
         updater.idle()
-elif mode == "prod":
+elif MODE == "prod":
     def run(updater):
         PORT = int(os.environ.get("PORT", "5000"))
         HEROKU_APP_NAME = os.environ.get("therealshow")
@@ -51,6 +54,15 @@ def start(bot, update):
 #Comando para mostrar las stats
 def stats(bot, update):
     logger.info('He recibido un comando stats')
+    #Bajar la db
+    ftp = FTP('ftpupload.net')
+    ftp.login(FTP_USR,FTP_PASS)
+    ftp.cwd('htdocs/trs-db')
+    try:
+        ftp.retrbinary("RETR therealshow.db" ,open('therealshow.db', 'wb').write)
+    except:
+        print ("Error conect ftp server")
+    ftp.quit()
     #Abrir conexion sql
     con = sqlite3.connect('therealshow.db')
     #Creamos un cursor
@@ -88,6 +100,15 @@ def stats(bot, update):
 #Comando para mostrar informacion especifica sobre un jugador
 def myStats(bot, update):
     logger.info('He recibido un comando MyStats de {}'.format (update.message.from_user.first_name))
+    #Bajar la db
+    ftp = FTP('ftpupload.net')
+    ftp.login(FTP_USR,FTP_PASS)
+    ftp.cwd('htdocs/trs-db')
+    try:
+        ftp.retrbinary("RETR therealshow.db" ,open('therealshow.db', 'wb').write)
+    except:
+        print ("Error conect ftp server")
+    ftp.quit()
     #Abrir conexion sql
     con = sqlite3.connect('therealshow.db')
     #Creamos un cursor
@@ -107,13 +128,25 @@ def myStats(bot, update):
             )
     #Si consulta es correcta
     else:
+        #Sacar el jugador
         j = datosmyStatsJugadores[0]
+        #Bajar la db
+        ftp = FTP('ftpupload.net')
+        ftp.login(FTP_USR,FTP_PASS)
+        ftp.cwd('htdocs/trs-fichas')
+        try:
+            ftp.retrbinary("RETR " + j[5] ,open(j[5], 'wb').write)
+        except:
+            print ("Error conect ftp server")
+        ftp.quit()
+        #Mostrar mensaje
         senderText = "📊 Stats de {} Season 2 📊\n".format(j[0])
         bot.send_photo(chat_id=update.message.chat_id, photo=open(j[5], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t🥺 P. Perdidos: " + str(j[4]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[4]))
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Comando para iniciar un partido
-def crearPartido(bot, update, args):
+#Comando para convocar un partido
+def convocar(bot, update, args):
+    
     logger.info('He recibido un comando CrearPartido de {}'.format (update.message.from_user.first_name))
     #Determinar el usuario
     user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
@@ -255,12 +288,12 @@ if __name__ == '__main__':
     logger.info("Starting bot")
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
-
+    
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('mystats', myStats))
 #------------------------------------------------DEV--------------------------------------------------------------------------------------------------
-    #dispatcher.add_handler(CommandHandler('crearpartido', crearPartido, pass_args=True))
+    #dispatcher.add_handler(CommandHandler('convocar', crearPartido, pass_args=True))
     #dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
     dispatcher.add_handler(CommandHandler('equipos', crearEquipos))
 
