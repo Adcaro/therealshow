@@ -50,10 +50,9 @@ def start(bot, update):
         parse_mode= ParseMode.MARKDOWN
     )
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Comando para mostrar las stats
-def stats(bot, update):
-    logger.info('He recibido un comando stats')
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------Funciones auxiliares-----------------------------------------------------------------------------------------------
+def descargarDB():
     #Bajar la db
     ftp = FTP('ftpupload.net')
     ftp.login(FTP_USR,FTP_PASS)
@@ -63,6 +62,100 @@ def stats(bot, update):
     except:
         print ("Error conect ftp server")
     ftp.quit()
+
+def subirDB():
+    #Subir la db
+    ftp = FTP('ftpupload.net')
+    ftp.login(FTP_USR,FTP_PASS)
+    ftp.cwd('htdocs/trs-db')
+    try:
+        ftp.storbinary('STOR therealshow.db', open('therealshow.db', 'rb'))
+    except:
+        print ("Error conect ftp server")
+    ftp.quit()
+
+def descargarXML():
+    #Bajar la db
+    ftp = FTP('ftpupload.net')
+    ftp.login(FTP_USR,FTP_PASS)
+    ftp.cwd('htdocs/trs-db')
+    try:
+        ftp.retrbinary("RETR partidos.xml" ,open('partidos.xml', 'wb').write)
+    except:
+        print ("Error conect ftp server")
+    ftp.quit()
+
+def descargarFicha(imagen):
+    #Descargar imagen
+    ftp = FTP('ftpupload.net')
+    ftp.login(FTP_USR,FTP_PASS)
+    ftp.cwd('htdocs/trs-fichas')
+    try:
+        ftp.retrbinary("RETR " + imagen ,open(imagen, 'wb').write)
+    except:
+        print ("Error conect ftp server")
+    ftp.quit()
+
+def darDeAltaPartido(tematica, fecha, hora, lugar, mensaje_Partido, chat):
+
+    partidoET = ET.Element("partido")
+    partidoET.set('Estado', 'incompleto')
+
+    tematicaET = ET.SubElement(partidoET, "tematica")
+    tematicaET.text = str(tematica)
+
+    fechaET = ET.SubElement(partidoET, "fecha")
+    fechaET.text = str(fecha)
+
+    horaET = ET.SubElement(partidoET, "hora")
+    horaET.text = str(hora)
+
+    lugarET = ET.SubElement(partidoET, "lugar")
+    lugarET.text = str(lugar)
+
+    mensajeET = ET.SubElement(partidoET, "mensaje")
+    mensajeET.text = str(mensaje_Partido)
+
+    chatET = ET.SubElement(partidoET, "chat")
+    chatET.text = str(chat)
+
+    jugadoresET = ET.SubElement(partidoET, "jugadores")
+    jugadoresET.set('numero', "0")
+
+    # Escribir el fichero
+    with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
+        tree = ET.parse('partidos.xml')
+        root = tree.getroot()
+        root.insert(0, partidoET)
+        tree.write('partidos.xml')
+    ftp = FTP('ftpupload.net')
+    ftp.login(FTP_USR,FTP_PASS)
+    ftp.cwd('htdocs/trs-db')
+    try:
+        ftp.storbinary('STOR partidos.xml', open('partidos.xml', 'rb'))
+    except:
+        print ("Error")
+    ftp.quit()
+
+def validarStats(argumentos):
+    print(argumentos)
+    leerstats = ""
+    for p in argumentos:
+        leerstats = leerstats + p + " "
+    print(leerstats)
+    match = re.search("([A-z]+[ ][0-9]+[-][0-9]+[-][01][ ]){10}", leerstats)
+    if(match):
+        return True
+    else:
+        return False
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Comando para mostrar las stats
+def stats(bot, update):
+    logger.info('He recibido un comando stats')
+    descargarDB()
     #Abrir conexion sql
     con = sqlite3.connect('therealshow.db')
     #Creamos un cursor
@@ -96,19 +189,12 @@ def stats(bot, update):
     #Cerrar la conexion SQL
     con.close()
 
+
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para mostrar informacion especifica sobre un jugador
 def myStats(bot, update):
     logger.info('He recibido un comando MyStats de {}'.format (update.message.from_user.first_name))
-    #Bajar la db
-    ftp = FTP('ftpupload.net')
-    ftp.login(FTP_USR,FTP_PASS)
-    ftp.cwd('htdocs/trs-db')
-    try:
-        ftp.retrbinary("RETR therealshow.db" ,open('therealshow.db', 'wb').write)
-    except:
-        print ("Error conect ftp server")
-    ftp.quit()
+    descargarDB()
     #Abrir conexion sql
     con = sqlite3.connect('therealshow.db')
     #Creamos un cursor
@@ -130,67 +216,80 @@ def myStats(bot, update):
     else:
         #Sacar el jugador
         j = datosmyStatsJugadores[0]
-        #Bajar la db
-        ftp = FTP('ftpupload.net')
-        ftp.login(FTP_USR,FTP_PASS)
-        ftp.cwd('htdocs/trs-fichas')
-        try:
-            ftp.retrbinary("RETR " + j[5] ,open(j[5], 'wb').write)
-        except:
-            print ("Error conect ftp server")
-        ftp.quit()
+        descargarFicha(j[5])
         #Mostrar mensaje
         senderText = "📊 Stats de {} Season 2 📊\n".format(j[0])
         bot.send_photo(chat_id=update.message.chat_id, photo=open(j[5], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t🥺 P. Perdidos: " + str(j[4]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[4]))
-
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para convocar un partido
 def convocar(bot, update, args):
-    
-    logger.info('He recibido un comando CrearPartido de {}'.format (update.message.from_user.first_name))
-    #Determinar el usuario
-    user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
+    logger.info('He recibido un comando CrearPartido de {}'.format(update.message.from_user.first_name))
     #Si el usuario es un administrador
-    if(user):
+    if(update.message.from_user.id == 776132385 or update.message.from_user.id == 164625805):
         logger.info('Usuario valido para generar partido')
         #Si no se pasan argumentos
         if(len(args) == 0):
             bot.send_message(
                 chat_id=update.message.chat_id,
-                text="La creación de un partido requiere una temática.",
+                text="La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -",
                 parse_mode= ParseMode.MARKDOWN
             )
         else:
         #Si todo esta correcto
-            tematica = ""
+            #Leer los parametros
+            parametros = ""
             for p in args:
-                tematica = tematica + p + " "
+                parametros = parametros + p + " "
             #Damos de alta el partido en la base de datos
-            #Abrir conexion sql
-            con = sqlite3.connect('therealshow.db')
-            #Creamos un cursor
-            cursorObj = con.cursor()
-            #Generar el mensaje
-            texto_Partido = "⚽ *" + tematica + "* ⚽"
-            mensaje_Partido = bot.send_message(
+            partidoItem = parametros.split("-")
+            if(len(partidoItem) != 4):
+                bot.send_message(
                 chat_id=update.message.chat_id,
-                text=texto_Partido,
-                parse_mode= ParseMode.MARKDOWN,
-            )
-            #Recopilamos la informacion del partido
-            valoresPartido = (tematica, update.message.chat_id, mensaje_Partido.message_id)
-            #Realizamos la insercción en la tabla
-            cursorObj.execute('INSERT INTO partido(tematica, idchat, idmensaje) VALUES(?, ?, ?)', valoresPartido)
-            #Completamos la modificacion
-            con.commit()
-            #Cerrar conexion
-            con.close()
-            bot.pin_chat_message(chat_id=update.message.chat_id, message_id = mensaje_Partido.message_id, disable_notification=None, timeout=None)
+                text="La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -",
+                parse_mode= ParseMode.MARKDOWN
+                )
+            else:
+                #Descargar xml
+                descargarXML()
+                #Parsear xml
+                with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
+                    tree = ET.parse(utf8_file)
+                root = tree.getroot()
+                incompleto = root.find('./partido[@Estado="incompleto"]')
+                completo = root.find('./partido[@Estado="completo"]')
+                if(incompleto):
+                    bot.send_message(
+                        chat_id=update.message.chat_id,
+                        text="@" + str(update.message.from_user.username) + " ya hay una convocatoria activa no puedes crear un partido aun.",
+                        parse_mode= ParseMode.MARKDOWN
+                    )
+                elif(completo):
+                    bot.send_message(
+                        chat_id=update.message.chat_id,
+                        text="@" + str(update.message.from_user.username) + " existe un partido ya completo, espera a que se juege para crear uno.",
+                        parse_mode= ParseMode.MARKDOWN
+                    )
+                else:
+                    #Generar el mensaje
+                    texto_Partido = "⚽ *" + partidoItem[0] + "* ⚽"
+                    texto_Partido = texto_Partido + "\n\n🗓 " + partidoItem[1]
+                    texto_Partido = texto_Partido + "\n🕑" + partidoItem[2]
+                    texto_Partido = texto_Partido + "\n🏟 " + partidoItem[3]
+                    texto_Partido = texto_Partido + "\n\n Jugadores: \n"
+                    mensaje_Partido = bot.send_message(
+                        chat_id=update.message.chat_id,
+                        text=texto_Partido,
+                        parse_mode= ParseMode.MARKDOWN,
+                    )
+                    #Guardamos la informacion del partido en la base de datos
+                    darDeAltaPartido(partidoItem[0], partidoItem[1], partidoItem[2], partidoItem[3], mensaje_Partido.message_id, update.message.chat_id)
+                    bot.pin_chat_message(chat_id=update.message.chat_id, message_id = mensaje_Partido.message_id, disable_notification=None, timeout=None)
     #Si el usuario no es un administrador
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="@" + str(update.message.from_user.username) + " solo el Convocator puede convocar sucio humano.",
+            text="@" + str(update.message.from_user.username) + " solo el Convocator puede convocar, sucio plebe",
             parse_mode= ParseMode.MARKDOWN
         )
 #Comando para apuntarse a un Partido
@@ -283,6 +382,40 @@ def crearEquipos(bot, update):
             text="" + update.message.from_user.first_name + " no eres el Haceedor de Equipos, no toques.",
             parse_mode= ParseMode.MARKDOWN
         )
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Comando para subir stats
+def subirStats(bot, update, args):
+    logger.info('He recibido un comando para subir stats de {}'.format (update.message.from_user.first_name))
+    admins = bot.getChatAdministrators(update.message.chat_id)
+    user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
+    if(user in admins and validarStats(args)):
+        #Numero de argumentos correcto
+        descargarDB()
+        #Abrir conexion sql
+        con = sqlite3.connect('therealshow.db')
+        #Creamos un cursor
+        cursorObj = con.cursor()
+        #Update stats
+        i = 0
+        while(i<10):
+            statsaux = args[i+1].split('-')
+            cursorObj.execute('UPDATE jugador SET ngoles = ngoles + {} WHERE nombre IS "{}"'.format(statsaux[0], args[i]))
+            cursorObj.execute('UPDATE jugador SET nasistencias = nasistencias + {} WHERE nombre IS "{}"'.format(statsaux[1], args[i]))
+            cursorObj.execute('UPDATE jugador SET pganados = pganados + {} WHERE nombre IS "{}"'.format(statsaux[2], args[i]))
+            cursorObj.execute('UPDATE jugador SET pjugados = pjugados + 1 WHERE nombre IS "{}"'.format(args[i]))
+            i = i + 2
+        #Grabamos los datos
+        con.commit()
+        #Cerrar la conexion SQL
+        con.close()
+        #Subir la base de datos
+        subirDB()
+    else:
+        bot.send_message(
+            chat_id = update.message.chat_id,
+            text = "El formato de la stats no es válido o no tienes permiso para modificar las stats <no se han realizado cambios en la base de datos>",
+            parse_mode = ParseMode.MARKDOWN
+        )
 #Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -292,9 +425,5 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('mystats', myStats))
-#------------------------------------------------DEV--------------------------------------------------------------------------------------------------
-    #dispatcher.add_handler(CommandHandler('convocar', crearPartido, pass_args=True))
-    #dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
-    dispatcher.add_handler(CommandHandler('equipos', crearEquipos))
-
+    dispatcher.add_handler(CommandHandler('subirstats', subirStats, pass_args=True))
     run(updater)
