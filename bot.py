@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 import sqlite3
+import re
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -220,7 +221,6 @@ def myStats(bot, update):
         #Mostrar mensaje
         senderText = "📊 Stats de {} Season 2 📊\n".format(j[0])
         bot.send_photo(chat_id=update.message.chat_id, photo=open(j[5], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t🥺 P. Perdidos: " + str(j[4]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[4]))
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para convocar un partido
 def convocar(bot, update, args):
