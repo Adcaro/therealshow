@@ -397,7 +397,7 @@ def subirStats(bot, update, args):
         cursorObj = con.cursor()
         #Update stats
         i = 0
-        while(i<10):
+        while(i<20):
             statsaux = args[i+1].split('-')
             cursorObj.execute('UPDATE jugador SET ngoles = ngoles + {} WHERE nombre IS "{}"'.format(statsaux[0], args[i]))
             cursorObj.execute('UPDATE jugador SET nasistencias = nasistencias + {} WHERE nombre IS "{}"'.format(statsaux[1], args[i]))
