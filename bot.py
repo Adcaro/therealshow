@@ -139,11 +139,9 @@ def darDeAltaPartido(tematica, fecha, hora, lugar, mensaje_Partido, chat):
     ftp.quit()
 
 def validarStats(argumentos):
-    print(argumentos)
     leerstats = ""
     for p in argumentos:
         leerstats = leerstats + p + " "
-    print(leerstats)
     match = re.search("([A-z]+[ ][0-9]+[-][0-9]+[-][01][ ]){10}", leerstats)
     if(match):
         return True
