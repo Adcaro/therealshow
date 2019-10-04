@@ -397,23 +397,47 @@ def subirStats(bot, update, args):
         i = 0
         while(i<20):
             statsaux = args[i+1].split('-')
-            cursorObj.execute('UPDATE jugador SET ngoles = ngoles + {} WHERE nombre IS "{}"'.format(statsaux[0], args[i]))
-            cursorObj.execute('UPDATE jugador SET nasistencias = nasistencias + {} WHERE nombre IS "{}"'.format(statsaux[1], args[i]))
-            cursorObj.execute('UPDATE jugador SET pganados = pganados + {} WHERE nombre IS "{}"'.format(statsaux[2], args[i]))
-            cursorObj.execute('UPDATE jugador SET pjugados = pjugados + 1 WHERE nombre IS "{}"'.format(args[i]))
+            logger.info("Actualizando stats de {} con goles {} asistencias {} ganados {}".format(args[i], statsaux[0], statsaux[1], statsaux[2]))
+            cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pjugados, img FROM jugador WHERE nombre IS "{}"'.format(args[i]))
+            datosJugador = cursorObj.fetchall()
+            if(datosJugador):
+                cursorObj.execute('UPDATE jugador SET ngoles = ngoles + {} WHERE nombre IS "{}"'.format(statsaux[0], args[i]))
+                cursorObj.execute('UPDATE jugador SET nasistencias = nasistencias + {} WHERE nombre IS "{}"'.format(statsaux[1], args[i]))
+                cursorObj.execute('UPDATE jugador SET pganados = pganados + {} WHERE nombre IS "{}"'.format(statsaux[2], args[i]))
+                cursorObj.execute('UPDATE jugador SET pjugados = pjugados + 1 WHERE nombre IS "{}"'.format(args[i]))
+                con.commit()
+            else:
+                bot.send_message(
+                    chat_id = update.message.chat_id,
+                    text = "Error en la base de datos con el usuario {}".format(args[i]),
+                    parse_mode = ParseMode.MARKDOWN
+                )
+                con.rollback()
+                con.commit()
+                i=99
             i = i + 2
-        #Grabamos los datos
-        con.commit()
         #Cerrar la conexion SQL
         con.close()
         #Subir la base de datos
         subirDB()
+        #Eliminar el mensaje
+        bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+        if(i < 99):
+            #Si todo ha salido bien
+            bot.send_message(
+                chat_id = update.message.chat_id,
+                text = "Stats actualizados correctamente",
+                parse_mode = ParseMode.MARKDOWN
+            )
+        
     else:
         bot.send_message(
             chat_id = update.message.chat_id,
             text = "El formato de la stats no es válido o no tienes permiso para modificar las stats <no se han realizado cambios en la base de datos>",
             parse_mode = ParseMode.MARKDOWN
         )
+
+
 #Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
