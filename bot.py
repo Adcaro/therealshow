@@ -383,7 +383,7 @@ def crearEquipos(bot, update):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para subir stats
 def subirStats(bot, update, args):
-    logger.info('He recibido un comando para subir stats de {}'.format (update.message.from_user.first_name))
+    logger.info('He recibido un comando para subir stats de {} en el grupo {}'.format (update.message.from_user.first_name, update.message.chat_id))
     admins = bot.getChatAdministrators(update.message.chat_id)
     user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
     if(user in admins and validarStats(args)):
@@ -444,7 +444,7 @@ def subirStats(bot, update, args):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando de resumen de la season 2
 def estadoSeason2(bot, update):
-    logger.info('He recibido un comando para conocer el estado de la season 2')
+    logger.info('He recibido un comando para conocer el estado de la season 2 en el grupo {}'.format(update.message.chat_id))
     descargarDB()
     #Abrir conexion sql
     con = sqlite3.connect('therealshow.db')
