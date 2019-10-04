@@ -383,7 +383,7 @@ def crearEquipos(bot, update):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para subir stats
 def subirStats(bot, update, args):
-    logger.info('He recibido un comando para subir stats de {} en el grupo {}'.format (update.message.from_user.first_name, update.message.chat_id))
+    logger.info('He recibido un comando para subir stats de {}'.format (update.message.from_user.first_name))
     admins = bot.getChatAdministrators(update.message.chat_id)
     user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
     if(user in admins and validarStats(args)):
@@ -468,7 +468,7 @@ def estadoSeason2(bot, update):
     #Mandamos el mensaje resumen
     bot.send_message(
             chat_id = update.message.chat_id,
-            text = "\t📒*Estado season 2*📒\n\n📅Fecha de inicio: {}\n⚽️Partidos totales: {}\n🏆PseudoGanador Goles: {}\n🏆PseudoGanador Asistencias: {} \n📈Mejor indice victorias: {} ({}/{})\n📉Zamuleto: {} ({})".format(partidosjugados[0][1],partidosjugados[0][0], ganadorGoles[0][0], asistencias[0][0], indice[0][0], indice[0][1], indice[0][2], racha[0][0], racha[0][1]),
+            text = "\t📒*Estado season 2*📒\n\n📅Fecha de inicio: {}\n⚽️Partidos totales: {}\n🏆PseudoGanador Goles: {}\n🏆PseudoGanador Asistencias: {} \n📈Mejor indice victorias: {} ({}/{})\n📿Zamuleto: {} ({})".format(partidosjugados[0][1],partidosjugados[0][0], ganadorGoles[0][0], asistencias[0][0], indice[0][0], indice[0][1], indice[0][2], racha[0][0], racha[0][1]),
             parse_mode = ParseMode.MARKDOWN
         )
 
