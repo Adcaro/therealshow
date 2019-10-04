@@ -463,7 +463,7 @@ def estadoSeason2(bot, update):
     cursorObj.execute('SELECT nombre, racha FROM jugador ORDER BY racha DESC, pjugados ASC, pganados DESC LIMIT 1')
     racha = cursorObj.fetchall()
     #Consultar el mejor indice de vicotrias
-    cursorObj.execute('SELECT nombre, pganados, pjugados FROM jugador ORDER BY pganados DESC, pjugados DESC LIMIT 1')
+    cursorObj.execute('SELECT nombre, pganados, pjugados FROM jugador ORDER BY pganados DESC, pjugados ASC LIMIT 1')
     indice = cursorObj.fetchall()
     #Mandamos el mensaje resumen
     bot.send_message(
