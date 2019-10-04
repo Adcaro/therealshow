@@ -451,7 +451,7 @@ def estadoSeason2(bot, update):
     #Creamos un cursor
     cursorObj = con.cursor()
     #Consulta los partidos jugados
-    cursorObj.execute('SELECT partidos, fecha FROM season WHERE id IS 2')
+    cursorObj.execute('SELECT partidos, fecha, vcolor, vblanco FROM season WHERE id IS 2')
     partidosjugados = cursorObj.fetchall()
     #Consultar el ganador de goles
     cursorObj.execute('SELECT nombre, ngoles FROM jugador ORDER BY ngoles DESC, pjugados ASC LIMIT 1')
@@ -468,7 +468,7 @@ def estadoSeason2(bot, update):
     #Mandamos el mensaje resumen
     bot.send_message(
             chat_id = update.message.chat_id,
-            text = "\t📒*Estado season 2*📒\n\n📅Fecha de inicio: {}\n⚽️Partidos totales: {}\n🏆PseudoGanador Goles: {}\n🏆PseudoGanador Asistencias: {} \n📈Mejor indice victorias: {} ({}/{})\n📿Zamuleto: {} ({})".format(partidosjugados[0][1],partidosjugados[0][0], ganadorGoles[0][0], asistencias[0][0], indice[0][0], indice[0][1], indice[0][2], racha[0][0], racha[0][1]),
+            text = "\t📒*Estado season 2*📒\n\n📅Fecha de inicio: {}\n⚽️Partidos totales: {}\n🏆PseudoGanador Goles: {}\n🏆PseudoGanador Asistencias: {} \n📈Mejor indice victorias: {} ({}/{})\n📿Zamuleto: {} ({})\n⚪️Victorias Blancos: {}\n🔵Victorias Color: {}".format(partidosjugados[0][1],partidosjugados[0][0], ganadorGoles[0][0], asistencias[0][0], indice[0][0], indice[0][1], indice[0][2], racha[0][0], racha[0][1], partidosjugados[0][3], partidosjugados[0][2]),
             parse_mode = ParseMode.MARKDOWN
         )
 
