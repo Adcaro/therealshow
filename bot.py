@@ -405,6 +405,10 @@ def subirStats(bot, update, args):
                 cursorObj.execute('UPDATE jugador SET nasistencias = nasistencias + {} WHERE nombre IS "{}"'.format(statsaux[1], args[i]))
                 cursorObj.execute('UPDATE jugador SET pganados = pganados + {} WHERE nombre IS "{}"'.format(statsaux[2], args[i]))
                 cursorObj.execute('UPDATE jugador SET pjugados = pjugados + 1 WHERE nombre IS "{}"'.format(args[i]))
+                if(statsaux[2]):
+                    cursorObj.execute('UPDATE jugador SET racha = racha + 1 WHERE nombre IS "{}"'.format(args[i]))
+                else:
+                    cursorObj.execute('UPDATE jugador SET racha = 0 WHERE nombre IS "{}"'.format(args[i]))
                 con.commit()
             else:
                 bot.send_message(
@@ -424,6 +428,7 @@ def subirStats(bot, update, args):
         bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
         if(i < 99):
             #Si todo ha salido bien
+            cursorObj.execute('UPDATE season SET partidos = partidos + 1 WHERE id IS 2')
             bot.send_message(
                 chat_id = update.message.chat_id,
                 text = "Stats actualizados correctamente",
@@ -436,7 +441,36 @@ def subirStats(bot, update, args):
             text = "El formato de la stats no es válido o no tienes permiso para modificar las stats <no se han realizado cambios en la base de datos>",
             parse_mode = ParseMode.MARKDOWN
         )
-
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Comando de resumen de la season 2
+def estadoSeason2(bot, update):
+    logger.info('He recibido un comando para conocer el estado de la season 2')
+    descargarDB()
+    #Abrir conexion sql
+    con = sqlite3.connect('therealshow.db')
+    #Creamos un cursor
+    cursorObj = con.cursor()
+    #Consulta los partidos jugados
+    cursorObj.execute('SELECT partidos, fecha FROM season WHERE id IS 2')
+    partidosjugados = cursorObj.fetchall()
+    #Consultar el ganador de goles
+    cursorObj.execute('SELECT nombre, ngoles FROM jugador ORDER BY ngoles DESC, pjugados ASC LIMIT 1')
+    ganadorGoles = cursorObj.fetchall()
+    #Consultar el ganador de asistencias
+    cursorObj.execute('SELECT nombre, nasistencias FROM jugador ORDER BY nasistencias DESC, pjugados ASC, pganados DESC LIMIT 1')
+    asistencias = cursorObj.fetchall()
+    #Consultar el ganador de racha
+    cursorObj.execute('SELECT nombre, racha FROM jugador ORDER BY racha DESC, pjugados ASC, pganados DESC LIMIT 1')
+    racha = cursorObj.fetchall()
+    #Consultar el mejor indice de vicotrias
+    cursorObj.execute('SELECT nombre, pganados, pjugados FROM jugador ORDER BY pganados DESC, pjugados DESC LIMIT 1')
+    indice = cursorObj.fetchall()
+    #Mandamos el mensaje resumen
+    bot.send_message(
+            chat_id = update.message.chat_id,
+            text = "\t📒*Estado season 2*📒\n\n📅Fecha de inicio: {}\n⚽️Partidos totales: {}\n🏆PseudoGanador Goles: {}\n🏆PseudoGanador Asistencias: {} \n📈Mejor indice victorias: {} ({}/{})\n📉Zamuleto: {} ({})".format(partidosjugados[0][1],partidosjugados[0][0], ganadorGoles[0][0], asistencias[0][0], indice[0][0], indice[0][1], indice[0][2], racha[0][0], racha[0][1]),
+            parse_mode = ParseMode.MARKDOWN
+        )
 
 #Main Function
 if __name__ == '__main__':
@@ -448,4 +482,5 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('stats', stats))
     dispatcher.add_handler(CommandHandler('mystats', myStats))
     dispatcher.add_handler(CommandHandler('subirstats', subirStats, pass_args=True))
+    dispatcher.add_handler(CommandHandler('season2', estadoSeason2))
     run(updater)
