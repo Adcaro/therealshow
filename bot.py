@@ -97,10 +97,10 @@ def descargarFicha(imagen):
         print ("Error conect ftp server")
     ftp.quit()
 
-def darDeAltaPartido(tematica, fecha, hora, lugar, mensaje_Partido, chat):
+def darDeAltaPartido(tematica, fecha, hora, lugar, mensaje_Partido, chat, texto):
 
     partidoET = ET.Element("partido")
-    partidoET.set('Estado', 'incompleto')
+    partidoET.set('estado', 'incompleto')
 
     tematicaET = ET.SubElement(partidoET, "tematica")
     tematicaET.text = str(tematica)
@@ -120,8 +120,11 @@ def darDeAltaPartido(tematica, fecha, hora, lugar, mensaje_Partido, chat):
     chatET = ET.SubElement(partidoET, "chat")
     chatET.text = str(chat)
 
+    textET = ET.SubElement(partidoET, "texto")
+    textET.text = str(texto)
+
     jugadoresET = ET.SubElement(partidoET, "jugadores")
-    jugadoresET.set('numero', "0")
+    jugadoresET.set('numero', '0')
 
     # Escribir el fichero
     with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
@@ -160,7 +163,7 @@ def stats(bot, update):
     #Creamos un cursor
     cursorObj = con.cursor()
     #Consulta para sacar los jugadores ordenados por goles
-    cursorObj.execute('SELECT nombre, ngoles FROM jugador ORDER BY ngoles DESC, pjugados ASC LIMIT 7')
+    cursorObj.execute('SELECT nombre, ngoles FROM jugador ORDER BY nasistencias DESC, pjugados ASC, pganados DESC LIMIT 7')
     #Samos todas las columnas de la consulta
     datosGolesJugadores = cursorObj.fetchall()
     #Preparar el mensaje
@@ -220,9 +223,10 @@ def myStats(bot, update):
         senderText = "📊 Stats de {} Season 2 📊\n".format(j[0])
         bot.send_photo(chat_id=update.message.chat_id, photo=open(j[5], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t🥺 P. Perdidos: " + str(j[4]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[4]))
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para convocar un partido
 def convocar(bot, update, args):
-    logger.info('He recibido un comando CrearPartido de {}'.format(update.message.from_user.first_name))
+    logger.info('He recibido un comando Convocar Partido de {}'.format(update.message.from_user.first_name))
     #Si el usuario es un administrador
     if(update.message.from_user.id == 776132385 or update.message.from_user.id == 164625805):
         logger.info('Usuario valido para generar partido')
@@ -281,7 +285,7 @@ def convocar(bot, update, args):
                         parse_mode= ParseMode.MARKDOWN,
                     )
                     #Guardamos la informacion del partido en la base de datos
-                    darDeAltaPartido(partidoItem[0], partidoItem[1], partidoItem[2], partidoItem[3], mensaje_Partido.message_id, update.message.chat_id)
+                    darDeAltaPartido(partidoItem[0], partidoItem[1], partidoItem[2], partidoItem[3], mensaje_Partido.message_id, update.message.chat_id, texto_Partido)
                     bot.pin_chat_message(chat_id=update.message.chat_id, message_id = mensaje_Partido.message_id, disable_notification=None, timeout=None)
     #Si el usuario no es un administrador
     else:
@@ -292,6 +296,9 @@ def convocar(bot, update, args):
         )
 #Comando para apuntarse a un Partido
 def apuntarsePartido(bot, update, args):
+    logger.info('He recibido un comando apuntarse')
+    #Descargar db
+    descargarXML()
     if(len(args) == 0):
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -299,87 +306,81 @@ def apuntarsePartido(bot, update, args):
             parse_mode= ParseMode.MARKDOWN
         )
     else:
-        #Debemos sacar el partido activo
-        #Abrir conexion sql
-        con = sqlite3.connect('therealshow.db')
-        #Creamos un cursor
-        cursorObj = con.cursor()
-        #Consulta para sacar las stats de un jugador
-        cursorObj.execute('SELECT tematica, idchat, idmensaje FROM partido WHERE idchat IS {}'.format(update.message.chat_id))
-        #Samos todas las columnas de la consulta
-        datosPartido = cursorObj.fetchall()
-        #Cerrar la conexion SQL
-        con.close()
-        if(not datosPartido):
+        # Buscar el partido activo
+        with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
+            tree = ET.parse('partidos.xml')
+            root = tree.getroot()
+        partido = root.find('.//partido[@estado="incompleto"]')
+        if(partido == None):
+            #mensaje de que no hay partido activo
             bot.send_message(
                 chat_id=update.message.chat_id,
-                text="" + update.message.from_user.username + " no hay partidos activos, si eres el Convocador puedes convocar uno.",
+                text="No hay ningun partido al que apuntarse, abrid una convocatoria.",
                 parse_mode= ParseMode.MARKDOWN
             )
         else:
-            #Sacar la tematica del jugador
-            tematicaJugador = ""
-            for p in args:
-                tematicaJugador = tematicaJugador + p + " "
-            #Add jugador
-            #Abrir conexion sql
-            con = sqlite3.connect('therealshow.db')
-            #Creamos un cursor
-            cursorObj = con.cursor()
-            #Consulta para sacar las stats de un jugador
-            cursorObj.execute('SELECT jugadores, tematicas, idmensaje, id FROM partido WHERE idchat IS {}'.format(update.message.chat_id))
-            #Samos todas las columnas de la consulta
-            sacarJugadores = cursorObj.fetchall()
-            #Cerrar la conexion SQL
-            con.close()
-            #Extraer jugadores
-            sacarJugadores = sacarJugadores [0]
-            idJugadores = sacarJugadores [0]
-            nombreJugadores = sacarJugadores[1]
-            idMensajeAnclado = sacarJugadores[2]
-            listaIdJugadores = list(idJugadores.split("~"))
-            nombreTematica = ""
-            for p in args:
-                nombreTematica = nombreTematica + p + " "
-            if(update.message.from_user.id in listaIdJugadores):
+            aux_jugador = partido.findall(".//jugador")
+            esta=False
+            for j in aux_jugador:
+                if(j.get("nombre") == update.message.from_user.first_name):
+                    esta = True
+            if(esta):
+                #El jugador ya existe y hay que editar el texto
                 bot.send_message(
                     chat_id=update.message.chat_id,
-                    text="" + update.message.from_user.username + " ya estas apuntado a esta convocatoria.",
+                    text="Ya estás apuntado",
                     parse_mode= ParseMode.MARKDOWN
                 )
             else:
-                nombreJugadores = nombreJugadores + "~" + nombreTematica
-                idJugadores = idJugadores + "~" + str(update.message.from_user.id)
-                bot.edit_message_text(chat_id=update.message.chat_id,
-                    message_id=idMensajeAnclado,
-                    text=update.message.text + "\n -" + nombreTematica,
-                    parse_mode= ParseMode.MARKDOWN)
-                #Abrir conexion sql
-                con = sqlite3.connect('therealshow.db')
-                #Creamos un cursor
-                cursorObj = con.cursor()
-                #Usamos el id del partido
-                sacarJugadores
-                #Consulta para sacar las stats de un jugador
-                cursorObj.execute('UPDATE partido SET jugadores = {} WHERE id IS {}'.format(update.message.chat_id, sacarJugadores[3]))
-                #Hacer un commit
-                con.commit()
-                #Cerrar la conexion SQL
-                con.close()
-#Comando para generar los equipos
-def crearEquipos(bot, update):
-    if(update.message.from_user.id == 892752079):
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text="",
-            parse_mode= ParseMode.MARKDOWN
-        )
-    else:
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text="" + update.message.from_user.first_name + " no eres el Haceedor de Equipos, no toques.",
-            parse_mode= ParseMode.MARKDOWN
-        )
+                idmensaje = partido.find("mensaje").text
+                idchat = partido.find("chat").text
+                textmensaje = partido.find("texto").text
+                njugadores = partido.find("jugadores").get("numero")
+                if(njugadores == "10"):
+                    bot.send_message(
+                        chat_id=update.message.chat_id,
+                        text="La convocatoria está completa. En futuras actualizaciones se te colocará como suplente (aún sin implementar)",
+                        parse_mode= ParseMode.MARKDOWN
+                    )
+                else:
+                    #Sacar la tematica del jugador
+                    tematicaJugador = ""
+                    for p in args:
+                        tematicaJugador = tematicaJugador + p + " "
+                    #Add jugador
+                    for jugador in partido.findall("jugador"):
+                        jugador.find("tematica")
+                    #Extraer jugadores
+                    #Comprobar si un jugador está ya apuntado
+                    if(not update.message.from_user.id):
+                        bot.send_message(
+                            chat_id=update.message.chat_id,
+                            text="" + update.message.from_user.username + " ya estas apuntado a esta convocatoria.",
+                            parse_mode= ParseMode.MARKDOWN
+                        )
+                    else:
+                        tematicaJugador2 = textmensaje + "\n -" + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
+                        bot.edit_message_text(chat_id=idchat,
+                            message_id=idmensaje,
+                            text=tematicaJugador2,
+                            parse_mode= ParseMode.MARKDOWN)
+                        jugadoresET = partido.find("jugadores")
+                        textmensajeET = partido.find("texto")
+                        textmensajeET.text = str(tematicaJugador2)
+                        player = ET.SubElement(jugadoresET, "jugador")
+                        player.set('nombre', update.message.from_user.first_name)
+                        player.set('ntematica', tematicaJugador)
+                        player.set('goles', '0')
+                        player.set('asist', '0')
+                        tree.write('partidos.xml')
+                        ftp = FTP('ftpupload.net')
+                        ftp.login(FTP_USR,FTP_PASS)
+                        ftp.cwd('htdocs/trs-db')
+                        try:
+                            ftp.storbinary('STOR partidos.xml', open('partidos.xml', 'rb'))
+                        except:
+                            print ("Error")
+                        ftp.quit()
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para subir stats
 def subirStats(bot, update, args):
@@ -471,7 +472,8 @@ def estadoSeason2(bot, update):
             text = "\t📒*Estado season 2*📒\n\n📅Fecha de inicio: {}\n⚽️Partidos totales: {}\n🏆PseudoGanador Goles: {}\n🏆PseudoGanador Asistencias: {} \n📈Mejor indice victorias: {} ({}/{})\n📿Zamuleto: {} ({})\n⚪️Victorias Blancos: {}\n🔵Victorias Color: {}".format(partidosjugados[0][1],partidosjugados[0][0], ganadorGoles[0][0], asistencias[0][0], indice[0][0], indice[0][1], indice[0][2], racha[0][0], racha[0][1], partidosjugados[0][3], partidosjugados[0][2]),
             parse_mode = ParseMode.MARKDOWN
         )
-
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------Funcion principal--------------------------------------------------------------------------------------------------
 #Main Function
 if __name__ == '__main__':
     logger.info("Starting bot")
@@ -483,4 +485,6 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('mystats', myStats))
     dispatcher.add_handler(CommandHandler('subirstats', subirStats, pass_args=True))
     dispatcher.add_handler(CommandHandler('season2', estadoSeason2))
+    dispatcher.add_handler(CommandHandler('convocar', convocar, pass_args=True))
+    dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
     run(updater)
