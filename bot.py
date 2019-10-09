@@ -292,6 +292,7 @@ def convocar(bot, update, args):
     #Si el usuario no es un administrador
     else:
         bot.send_message(
+            reply_to_message_id= update.message.message_id,
             chat_id=update.message.chat_id,
             text="@" + str(update.message.from_user.username) + " solo el Convocator puede convocar, sucio plebe",
             parse_mode= ParseMode.MARKDOWN
@@ -303,7 +304,12 @@ def apuntarsePartido(bot, update, args):
     #Descargar db
     descargarXML()
     if(len(args) == 0):
-        update.message.reply_text("Para apuntarte al partido tienes que poner, a continuación del comando, un nombre.")
+        bot.send_message(
+            reply_to_message_id= update.message.message_id,
+            chat_id=update.message.chat_id,
+            text="Para apuntarte al partido tienes que poner, a continuación del comando, un nombre.",
+            parse_mode= ParseMode.MARKDOWN
+        )
     else:
         # Buscar el partido activo
         with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
@@ -321,13 +327,12 @@ def apuntarsePartido(bot, update, args):
                     esta = True
             if(esta):
                 #El jugador ya existe y hay que editar el texto
-                update.message.reply_text("Ya estás apuntado.")
-                '''
                 bot.send_message(
+                    reply_to_message_id= update.message.message_id,
                     chat_id=update.message.chat_id,
                     text="Ya estás apuntado",
                     parse_mode= ParseMode.MARKDOWN
-                )'''
+                )
             else:
                 idmensaje = partido.find("mensaje").text
                 idchat = partido.find("chat").text
@@ -335,6 +340,7 @@ def apuntarsePartido(bot, update, args):
                 njugadores = partido.find("jugadores").get("numero")
                 if(njugadores == "10"):
                     bot.send_message(
+                        reply_to_message_id= update.message.message_id,
                         chat_id=update.message.chat_id,
                         text="La convocatoria está completa. En futuras actualizaciones se te colocará como suplente (aún sin implementar)",
                         parse_mode= ParseMode.MARKDOWN
@@ -351,6 +357,7 @@ def apuntarsePartido(bot, update, args):
                     #Comprobar si un jugador está ya apuntado
                     if(not update.message.from_user.id):
                         bot.send_message(
+                            reply_to_message_id= update.message.message_id,
                             chat_id=update.message.chat_id,
                             text="" + update.message.from_user.username + " ya estas apuntado a esta convocatoria.",
                             parse_mode= ParseMode.MARKDOWN
@@ -362,6 +369,12 @@ def apuntarsePartido(bot, update, args):
                             message_id=idmensaje,
                             text=tematicaJugador2,
                             parse_mode= ParseMode.MARKDOWN)
+                        bot.send_message(
+                            reply_to_message_id= update.message.message_id,
+                            chat_id=update.message.chat_id,
+                            text="Apuntado!😉",
+                            parse_mode= ParseMode.MARKDOWN
+                        )
                         jugadoresET = partido.find("jugadores")
                         n = jugadoresET.get('numero')
                         jugadoresET.set('numero', n+1)
