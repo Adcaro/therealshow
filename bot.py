@@ -363,7 +363,7 @@ def apuntarsePartido(bot, update, args):
                             parse_mode= ParseMode.MARKDOWN
                         )
                     else:
-                        index = partido.get("estado") + 1
+                        index = str(partido.get("estado") + 1)
                         tematicaJugador2 = textmensaje + "\n {}) ".format(index) + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
                         bot.edit_message_text(chat_id=idchat,
                             message_id=idmensaje,
