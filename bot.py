@@ -14,13 +14,13 @@ import re
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger('TheRealShow')
 
-#-------------------------------------------------------------------CHANGE---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------Variables de entorno-------------------------------------------------------------------------------------
 # Getting mode, so we could define run function for local and Heroku setup
 MODE = os.environ.get("BOT_MODE")
 TOKEN = os.environ.get("BOT_KEY")
 FTP_USR = os.environ.get("FTPUSR")
 FTP_PASS = os.environ.get("FTPPASS")
-#-------------------------------------------------------------------CHANGE---------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------Variables de entorno-------------------------------------------------------------------------------------
 
 if MODE == "dev":
     def run(updater):
@@ -232,11 +232,13 @@ def convocar(bot, update, args):
         logger.info('Usuario valido para generar partido')
         #Si no se pasan argumentos
         if(len(args) == 0):
+            update.message.reply_text("La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -")
+            '''
             bot.send_message(
                 chat_id=update.message.chat_id,
                 text="La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -",
                 parse_mode= ParseMode.MARKDOWN
-            )
+            )'''
         else:
         #Si todo esta correcto
             #Leer los parametros
@@ -246,11 +248,13 @@ def convocar(bot, update, args):
             #Damos de alta el partido en la base de datos
             partidoItem = parametros.split("-")
             if(len(partidoItem) != 4):
+                update.message.reply_text("La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -")
+                '''
                 bot.send_message(
-                chat_id=update.message.chat_id,
-                text="La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -",
-                parse_mode= ParseMode.MARKDOWN
-                )
+                    chat_id=update.message.chat_id,
+                    text="La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -",
+                    parse_mode= ParseMode.MARKDOWN
+                )'''
             else:
                 #Descargar xml
                 descargarXML()
@@ -274,10 +278,10 @@ def convocar(bot, update, args):
                     )
                 else:
                     #Generar el mensaje
-                    texto_Partido = "⚽ *" + partidoItem[0] + "* ⚽"
-                    texto_Partido = texto_Partido + "\n\n🗓 " + partidoItem[1]
-                    texto_Partido = texto_Partido + "\n🕑" + partidoItem[2]
-                    texto_Partido = texto_Partido + "\n🏟 " + partidoItem[3]
+                    texto_Partido = "⚽ ```" + partidoItem[0] + "``` ⚽"
+                    texto_Partido = texto_Partido + "\n\n🗓 *" + partidoItem[1] + "*"
+                    texto_Partido = texto_Partido + "\n🕑 __" + partidoItem[2] +"__"
+                    texto_Partido = texto_Partido + "\n🏟 _" + partidoItem[3] + "_"
                     texto_Partido = texto_Partido + "\n\n Jugadores: \n"
                     mensaje_Partido = bot.send_message(
                         chat_id=update.message.chat_id,
@@ -294,17 +298,14 @@ def convocar(bot, update, args):
             text="@" + str(update.message.from_user.username) + " solo el Convocator puede convocar, sucio plebe",
             parse_mode= ParseMode.MARKDOWN
         )
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para apuntarse a un Partido
 def apuntarsePartido(bot, update, args):
     logger.info('He recibido un comando apuntarse')
     #Descargar db
     descargarXML()
     if(len(args) == 0):
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text="Para apuntarte al partido tienes que poner, a continuación del comando, un nombre.",
-            parse_mode= ParseMode.MARKDOWN
-        )
+        update.message.reply_text("Para apuntarte al partido tienes que poner, a continuación del comando, un nombre.")
     else:
         # Buscar el partido activo
         with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
@@ -313,11 +314,7 @@ def apuntarsePartido(bot, update, args):
         partido = root.find('.//partido[@estado="incompleto"]')
         if(partido == None):
             #mensaje de que no hay partido activo
-            bot.send_message(
-                chat_id=update.message.chat_id,
-                text="No hay ningun partido al que apuntarse, abrid una convocatoria.",
-                parse_mode= ParseMode.MARKDOWN
-            )
+            update.message.reply_text("No hay ningun partido al que apuntarse, abrid una convocatoria.")
         else:
             aux_jugador = partido.findall(".//jugador")
             esta=False
@@ -326,11 +323,13 @@ def apuntarsePartido(bot, update, args):
                     esta = True
             if(esta):
                 #El jugador ya existe y hay que editar el texto
+                update.message.reply_text("Ya estás apuntado.")
+                '''
                 bot.send_message(
                     chat_id=update.message.chat_id,
                     text="Ya estás apuntado",
                     parse_mode= ParseMode.MARKDOWN
-                )
+                )'''
             else:
                 idmensaje = partido.find("mensaje").text
                 idchat = partido.find("chat").text
@@ -359,12 +358,17 @@ def apuntarsePartido(bot, update, args):
                             parse_mode= ParseMode.MARKDOWN
                         )
                     else:
-                        tematicaJugador2 = textmensaje + "\n -" + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
+                        index = partido.get("estado") + 1
+                        tematicaJugador2 = textmensaje + "\n {}) ".format(index) + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
                         bot.edit_message_text(chat_id=idchat,
                             message_id=idmensaje,
                             text=tematicaJugador2,
                             parse_mode= ParseMode.MARKDOWN)
                         jugadoresET = partido.find("jugadores")
+                        n = jugadoresET.get('numero')
+                        jugadoresET.set('numero', n+1)
+                        if(n == '10'):
+                            partido.set("estado", 'completo')
                         textmensajeET = partido.find("texto")
                         textmensajeET.text = str(tematicaJugador2)
                         player = ET.SubElement(jugadoresET, "jugador")
@@ -410,7 +414,6 @@ def subirStats(bot, update, args):
                     cursorObj.execute('UPDATE jugador SET racha = racha + 1 WHERE nombre IS "{}"'.format(args[i]))
                 else:
                     cursorObj.execute('UPDATE jugador SET racha = 0 WHERE nombre IS "{}"'.format(args[i]))
-                con.commit()
             else:
                 bot.send_message(
                     chat_id = update.message.chat_id,
@@ -418,9 +421,10 @@ def subirStats(bot, update, args):
                     parse_mode = ParseMode.MARKDOWN
                 )
                 con.rollback()
-                con.commit()
                 i=99
             i = i + 2
+        #Realizar un commit
+        con.commit()
         #Cerrar la conexion SQL
         con.close()
         #Subir la base de datos
