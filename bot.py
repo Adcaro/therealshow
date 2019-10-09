@@ -232,13 +232,12 @@ def convocar(bot, update, args):
         logger.info('Usuario valido para generar partido')
         #Si no se pasan argumentos
         if(len(args) == 0):
-            update.message.reply_text("La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -")
-            '''
             bot.send_message(
+                reply_to_message_id= update.message.message_id,
                 chat_id=update.message.chat_id,
                 text="La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -",
                 parse_mode= ParseMode.MARKDOWN
-            )'''
+            )
         else:
         #Si todo esta correcto
             #Leer los parametros
@@ -248,13 +247,12 @@ def convocar(bot, update, args):
             #Damos de alta el partido en la base de datos
             partidoItem = parametros.split("-")
             if(len(partidoItem) != 4):
-                update.message.reply_text("La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -")
-                '''
                 bot.send_message(
+                    reply_to_message_id= update.message.message_id,
                     chat_id=update.message.chat_id,
                     text="La creación de un partido requiere una temática, fecha, hora, lugar, sepearados por -",
                     parse_mode= ParseMode.MARKDOWN
-                )'''
+                )
             else:
                 #Descargar xml
                 descargarXML()
@@ -278,9 +276,9 @@ def convocar(bot, update, args):
                     )
                 else:
                     #Generar el mensaje
-                    texto_Partido = "⚽ ```" + partidoItem[0] + "``` ⚽"
+                    texto_Partido = "⚽ `" + partidoItem[0] + "` ⚽"
                     texto_Partido = texto_Partido + "\n\n🗓 *" + partidoItem[1] + "*"
-                    texto_Partido = texto_Partido + "\n🕑 __" + partidoItem[2] +"__"
+                    texto_Partido = texto_Partido + "\n🕑 [{}]".format(partidoItem[2])
                     texto_Partido = texto_Partido + "\n🏟 _" + partidoItem[3] + "_"
                     texto_Partido = texto_Partido + "\n\n Jugadores: \n"
                     mensaje_Partido = bot.send_message(
