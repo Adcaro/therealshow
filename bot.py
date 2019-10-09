@@ -163,7 +163,7 @@ def stats(bot, update):
     #Creamos un cursor
     cursorObj = con.cursor()
     #Consulta para sacar los jugadores ordenados por goles
-    cursorObj.execute('SELECT nombre, ngoles FROM jugador ORDER BY nasistencias DESC, pjugados ASC, pganados DESC LIMIT 7')
+    cursorObj.execute('SELECT nombre, ngoles FROM jugador ORDER BY ngoles DESC, pjugados ASC, pganados DESC LIMIT 7')
     #Samos todas las columnas de la consulta
     datosGolesJugadores = cursorObj.fetchall()
     #Preparar el mensaje
