@@ -382,6 +382,7 @@ def apuntarsePartido(bot, update, args):
                         textmensajeET.text = str(tematicaJugador2)
                         player = ET.SubElement(jugadoresET, "jugador")
                         player.set('nombre', update.message.from_user.first_name)
+                        player.set('id', update.message.from_user.id)
                         player.set('ntematica', tematicaJugador)
                         player.set('goles', '0')
                         player.set('asist', '0')
@@ -497,6 +498,7 @@ def apuntarBot(bot, update, args):
                         textmensajeET.text = str(tematicaJugador2)
                         player = ET.SubElement(jugadoresET, "jugador")
                         player.set('nombre', botjugador)
+                        player.set('id', "None")
                         player.set('ntematica', tematicaJugador)
                         player.set('goles', '0')
                         player.set('asist', '0')
@@ -552,7 +554,7 @@ def subirStats(bot, update, args):
                 )
                 i=99
             i = i + 2
-        if(i != 99):
+        if(i < 99):
             #Si todo ha salido bien
             cursorObj.execute('UPDATE season SET partidos = partidos + 1 WHERE id IS 2')
             bot.send_message(
