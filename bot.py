@@ -261,17 +261,11 @@ def convocar(bot, update, args):
                     tree = ET.parse(utf8_file)
                 root = tree.getroot()
                 incompleto = root.find('./partido[@Estado="incompleto"]')
-                completo = root.find('./partido[@Estado="completo"]')
                 if(incompleto):
                     bot.send_message(
+                        reply_to_message_id= update.message.message_id,
                         chat_id=update.message.chat_id,
                         text="@" + str(update.message.from_user.username) + " ya hay una convocatoria activa no puedes crear un partido aun.",
-                        parse_mode= ParseMode.MARKDOWN
-                    )
-                elif(completo):
-                    bot.send_message(
-                        chat_id=update.message.chat_id,
-                        text="@" + str(update.message.from_user.username) + " existe un partido ya completo, espera a que se juege para crear uno.",
                         parse_mode= ParseMode.MARKDOWN
                     )
                 else:
@@ -318,7 +312,12 @@ def apuntarsePartido(bot, update, args):
         partido = root.find('.//partido[@estado="incompleto"]')
         if(partido == None):
             #mensaje de que no hay partido activo
-            update.message.reply_text("No hay ningun partido al que apuntarse, abrid una convocatoria.")
+            bot.send_message(
+                reply_to_message_id= update.message.message_id,
+                chat_id=update.message.chat_id,
+                text="No hay ningun partido al que apuntarse, abrid una convocatoria.",
+                parse_mode= ParseMode.MARKDOWN
+            )
         else:
             aux_jugador = partido.findall(".//jugador")
             esta=False
@@ -396,6 +395,121 @@ def apuntarsePartido(bot, update, args):
                         except:
                             print ("Error")
                         ftp.quit()
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Comando para apuntarse a un Partido
+def apuntarbot(bot, update, args):
+    logger.info('He recibido un comando apuntar bot')
+    #Descargar db
+    descargarXML()
+    if(len(args) == 0):
+        bot.send_message(
+            reply_to_message_id= update.message.message_id,
+            chat_id=update.message.chat_id,
+            text="Para apuntar un bot al partido tienes que poner: nombre jugador - tematica jugador",
+            parse_mode= ParseMode.MARKDOWN
+        )
+    else:
+        # Buscar el partido activo
+        with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
+            tree = ET.parse('partidos.xml')
+            root = tree.getroot()
+        partido = root.find('.//partido[@estado="incompleto"]')
+        if(partido == None):
+            #mensaje de que no hay partido activo
+            bot.send_message(
+                reply_to_message_id= update.message.message_id,
+                chat_id=update.message.chat_id,
+                text="No hay ningun partido al que apuntar un jugador, abrid una convocatoria.",
+                parse_mode= ParseMode.MARKDOWN
+            )
+        else:
+            descargarDB()
+            #Abrir conexion sql
+            con = sqlite3.connect('therealshow.db')
+            #Creamos un cursor
+            cursorObj = con.cursor()
+            #Consulta para sacar las stats de un jugador
+            cursorObj.execute('SELECT nombre FROM jugador WHERE nombre IS {}'.format(args[0]))
+            #Samos todas las columnas de la consulta
+            existe = cursorObj.fetchall()
+            #Cerrar la conexion SQL
+            con.close()
+            if(not existe):
+                #mensaje de que no hay partido activo
+                bot.send_message(
+                    reply_to_message_id= update.message.message_id,
+                    chat_id=update.message.chat_id,
+                    text="No hay ningun bot con ese nombre.",
+                    parse_mode= ParseMode.MARKDOWN
+                )
+            else:
+                aux_jugador = partido.findall(".//jugador")
+                esta=False
+                for j in aux_jugador:
+                    if(j.get("nombre") == args[0]):
+                        esta = True
+                if(esta):
+                    #El jugador ya existe y hay que editar el texto
+                    bot.send_message(
+                        reply_to_message_id= update.message.message_id,
+                        chat_id=update.message.chat_id,
+                        text="Ese jugador ya está apuntado",
+                        parse_mode= ParseMode.MARKDOWN
+                    )
+                else:
+                    idmensaje = partido.find("mensaje").text
+                    idchat = partido.find("chat").text
+                    textmensaje = partido.find("texto").text
+                    njugadores = partido.find("jugadores").get("numero")
+                    if(njugadores == "10"):
+                        bot.send_message(
+                            reply_to_message_id= update.message.message_id,
+                            chat_id=update.message.chat_id,
+                            text="La convocatoria está completa. En futuras actualizaciones se te colocará como suplente (aún sin implementar)",
+                            parse_mode= ParseMode.MARKDOWN
+                        )
+                    else:
+                        #Sacar la tematica del jugador
+                        tematicaJugador = ""
+                        botjugador = args[0]
+                        args.pop(0)
+                        for p in args:
+                            tematicaJugador = tematicaJugador + p + " "
+                        #Extraer jugadores
+                        index = str(partido.get("estado") + 1)
+                        tematicaJugador2 = textmensaje + "\n {}) ".format(index) + tematicaJugador + " - ({})".format(botjugador)
+                        bot.edit_message_text(chat_id=idchat,
+                            message_id=idmensaje,
+                            text=tematicaJugador2,
+                            parse_mode= ParseMode.MARKDOWN)
+                        bot.send_message(
+                            reply_to_message_id= update.message.message_id,
+                            chat_id=update.message.chat_id,
+                            text="{} apuntado!😉".format(botjugador),
+                            parse_mode= ParseMode.MARKDOWN
+                        )
+                        jugadoresET = partido.find("jugadores")
+                        n = jugadoresET.get('numero')
+                        jugadoresET.set('numero', n+1)
+                        if(n == '10'):
+                            partido.set("estado", 'completo')
+                        textmensajeET = partido.find("texto")
+                        textmensajeET.text = str(tematicaJugador2)
+                        player = ET.SubElement(jugadoresET, "jugador")
+                        player.set('nombre', botjugador)
+                        player.set('ntematica', tematicaJugador)
+                        player.set('goles', '0')
+                        player.set('asist', '0')
+                        tree.write('partidos.xml')
+                        ftp = FTP('ftpupload.net')
+                        ftp.login(FTP_USR,FTP_PASS)
+                        ftp.cwd('htdocs/trs-db')
+                        try:
+                            ftp.storbinary('STOR partidos.xml', open('partidos.xml', 'rb'))
+                        except:
+                            print ("Error")
+                        ftp.quit()
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para subir stats
 def subirStats(bot, update, args):
@@ -403,12 +517,18 @@ def subirStats(bot, update, args):
     admins = bot.getChatAdministrators(update.message.chat_id)
     user = bot.getChatMember(update.message.chat_id, update.message.from_user.id, timeout=None)
     if(user in admins and validarStats(args)):
-        #Numero de argumentos correcto
+        #Bajar las bases de datos
+        descargarXML()
         descargarDB()
         #Abrir conexion sql
         con = sqlite3.connect('therealshow.db')
         #Creamos un cursor
         cursorObj = con.cursor()
+        # Buscar el partido activo
+        with open('partidos.xml', 'r', encoding='latin-1') as utf8_file:
+            tree = ET.parse('partidos.xml')
+            root = tree.getroot()
+        partido = root.find('.//partido[@estado="completo"]')
         #Update stats
         i = 0
         while(i<20):
@@ -431,18 +551,9 @@ def subirStats(bot, update, args):
                     text = "Error en la base de datos con el usuario {}".format(args[i]),
                     parse_mode = ParseMode.MARKDOWN
                 )
-                con.rollback()
                 i=99
             i = i + 2
-        #Realizar un commit
-        con.commit()
-        #Cerrar la conexion SQL
-        con.close()
-        #Subir la base de datos
-        subirDB()
-        #Eliminar el mensaje
-        bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
-        if(i < 99):
+        if(i != 99):
             #Si todo ha salido bien
             cursorObj.execute('UPDATE season SET partidos = partidos + 1 WHERE id IS 2')
             bot.send_message(
@@ -450,7 +561,16 @@ def subirStats(bot, update, args):
                 text = "Stats actualizados correctamente",
                 parse_mode = ParseMode.MARKDOWN
             )
-        
+            #Realizar un commit
+            con.commit()
+            #Cerrar la conexion SQL
+            con.close()
+            #Subir la base de datos
+            subirDB()
+        else:
+            con.close()
+        #Eliminar el mensaje
+        bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
     else:
         bot.send_message(
             chat_id = update.message.chat_id,
