@@ -288,7 +288,7 @@ def convocar(bot, update, args):
         bot.send_message(
             reply_to_message_id= update.message.message_id,
             chat_id=update.message.chat_id,
-            text="@" + str(update.message.from_user.username) + " solo el Convocator puede convocar, sucio plebe",
+            text="@" + str(update.message.from_user.username) + " solo el Convocator puede convocar",
             parse_mode= ParseMode.MARKDOWN
         )
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -362,8 +362,7 @@ def apuntarsePartido(bot, update, args):
                             parse_mode= ParseMode.MARKDOWN
                         )
                     else:
-                        index = str(partido.get("estado") + 1)
-                        tematicaJugador2 = textmensaje + "\n {}) ".format(index) + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
+                        tematicaJugador2 = textmensaje + "\n {}) ".format(int(njugadores)+1) + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
                         bot.edit_message_text(chat_id=idchat,
                             message_id=idmensaje,
                             text=tematicaJugador2,
@@ -375,8 +374,8 @@ def apuntarsePartido(bot, update, args):
                             parse_mode= ParseMode.MARKDOWN
                         )
                         jugadoresET = partido.find("jugadores")
-                        n = jugadoresET.get('numero')
-                        jugadoresET.set('numero', n+1)
+                        n = int(jugadoresET.get('numero'))
+                        jugadoresET.set('numero', str(n+1))
                         if(n == '10'):
                             partido.set("estado", 'completo')
                         textmensajeET = partido.find("texto")
@@ -398,7 +397,7 @@ def apuntarsePartido(bot, update, args):
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para apuntarse a un Partido
-def apuntarbot(bot, update, args):
+def apuntarBot(bot, update, args):
     logger.info('He recibido un comando apuntar bot')
     #Descargar db
     descargarXML()
@@ -406,7 +405,7 @@ def apuntarbot(bot, update, args):
         bot.send_message(
             reply_to_message_id= update.message.message_id,
             chat_id=update.message.chat_id,
-            text="Para apuntar un bot al partido tienes que poner: nombre jugador - tematica jugador",
+            text="Para apuntar un bot al partido tienes que poner: nombre jugador y tematica jugador",
             parse_mode= ParseMode.MARKDOWN
         )
     else:
@@ -430,9 +429,11 @@ def apuntarbot(bot, update, args):
             #Creamos un cursor
             cursorObj = con.cursor()
             #Consulta para sacar las stats de un jugador
-            cursorObj.execute('SELECT nombre FROM jugador WHERE nombre IS {}'.format(args[0]))
-            #Samos todas las columnas de la consulta
-            existe = cursorObj.fetchall()
+            try:
+                cursorObj.execute('SELECT idjugador, nombre FROM jugador WHERE nombre IS "{}"'.format(args[0]))
+                existe = cursorObj.fetchall()
+            except:
+                existe = None
             #Cerrar la conexion SQL
             con.close()
             if(not existe):
@@ -476,9 +477,7 @@ def apuntarbot(bot, update, args):
                         args.pop(0)
                         for p in args:
                             tematicaJugador = tematicaJugador + p + " "
-                        #Extraer jugadores
-                        index = str(partido.get("estado") + 1)
-                        tematicaJugador2 = textmensaje + "\n {}) ".format(index) + tematicaJugador + " - ({})".format(botjugador)
+                        tematicaJugador2 = textmensaje + "\n {}) ".format(int(njugadores)+1) + tematicaJugador + " - ({})".format(botjugador)
                         bot.edit_message_text(chat_id=idchat,
                             message_id=idmensaje,
                             text=tematicaJugador2,
@@ -490,8 +489,8 @@ def apuntarbot(bot, update, args):
                             parse_mode= ParseMode.MARKDOWN
                         )
                         jugadoresET = partido.find("jugadores")
-                        n = jugadoresET.get('numero')
-                        jugadoresET.set('numero', n+1)
+                        n = int(jugadoresET.get('numero'))
+                        jugadoresET.set('numero', str(n+1))
                         if(n == '10'):
                             partido.set("estado", 'completo')
                         textmensajeET = partido.find("texto")
@@ -622,4 +621,5 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('season2', estadoSeason2))
     dispatcher.add_handler(CommandHandler('convocar', convocar, pass_args=True))
     dispatcher.add_handler(CommandHandler('apuntarse', apuntarsePartido, pass_args=True))
+    dispatcher.add_handler(CommandHandler('apuntarbot', apuntarBot, pass_args=True))
     run(updater)
