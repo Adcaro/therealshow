@@ -375,7 +375,7 @@ def apuntarsePartido(bot, update, args):
                         )
                         jugadoresET = partido.find("jugadores")
                         n = int(jugadoresET.get('numero'))
-                        jugadoresET.set('numero', str(n+1))
+                        jugadoresET.set('numero', str(int(njugadores)+1))
                         if(n == '10'):
                             partido.set("estado", 'completo')
                         textmensajeET = partido.find("texto")
