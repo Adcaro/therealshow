@@ -397,6 +397,7 @@ def apuntarsePartido(bot, update, args):
                                 parse_mode= ParseMode.MARKDOWN
                             )
                         except:
+                            raise
                             bot.send_message(
                                 reply_to_message_id= update.message.message_id,
                                 chat_id=update.message.chat_id,
