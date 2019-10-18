@@ -362,39 +362,47 @@ def apuntarsePartido(bot, update, args):
                             parse_mode= ParseMode.MARKDOWN
                         )
                     else:
-                        tematicaJugador2 = textmensaje + "\n {}) ".format(int(njugadores)+1) + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
-                        bot.edit_message_text(chat_id=idchat,
-                            message_id=idmensaje,
-                            text=tematicaJugador2,
-                            parse_mode= ParseMode.MARKDOWN)
-                        bot.send_message(
-                            reply_to_message_id= update.message.message_id,
-                            chat_id=update.message.chat_id,
-                            text="Apuntado!😉",
-                            parse_mode= ParseMode.MARKDOWN
-                        )
-                        jugadoresET = partido.find("jugadores")
-                        n = int(jugadoresET.get('numero'))
-                        jugadoresET.set('numero', str(int(njugadores)+1))
-                        if(n == '10'):
-                            partido.set("estado", 'completo')
-                        textmensajeET = partido.find("texto")
-                        textmensajeET.text = str(tematicaJugador2)
-                        player = ET.SubElement(jugadoresET, "jugador")
-                        player.set('nombre', update.message.from_user.first_name)
-                        player.set('id', update.message.from_user.id)
-                        player.set('ntematica', tematicaJugador)
-                        player.set('goles', '0')
-                        player.set('asist', '0')
-                        tree.write('partidos.xml')
-                        ftp = FTP('ftpupload.net')
-                        ftp.login(FTP_USR,FTP_PASS)
-                        ftp.cwd('htdocs/trs-db')
                         try:
-                            ftp.storbinary('STOR partidos.xml', open('partidos.xml', 'rb'))
+                            tematicaJugador2 = textmensaje + "\n {}) ".format(int(njugadores)+1) + tematicaJugador + " - ({})".format(update.message.from_user.first_name)
+                            bot.edit_message_text(chat_id=idchat,
+                                message_id=idmensaje,
+                                text=tematicaJugador2,
+                                parse_mode= ParseMode.MARKDOWN)
+                            jugadoresET = partido.find("jugadores")
+                            n = int(jugadoresET.get('numero'))
+                            jugadoresET.set('numero', str(n+1))
+                            if(n == 10):
+                                partido.set("estado", 'completo')
+                            textmensajeET = partido.find("texto")
+                            textmensajeET.text = str(tematicaJugador2)
+                            player = ET.SubElement(jugadoresET, "jugador")
+                            player.set('nombre', update.message.from_user.first_name)
+                            player.set('id', str(update.message.from_user.id))
+                            player.set('ntematica', tematicaJugador)
+                            player.set('goles', '0')
+                            player.set('asist', '0')
+                            tree.write('partidos.xml')
+                            ftp = FTP('ftpupload.net')
+                            ftp.login(FTP_USR,FTP_PASS)
+                            ftp.cwd('htdocs/trs-db')
+                            try:
+                                ftp.storbinary('STOR partidos.xml', open('partidos.xml', 'rb'))
+                            except:
+                                print ("Error")
+                            ftp.quit()
+                            bot.send_message(
+                                reply_to_message_id= update.message.message_id,
+                                chat_id=update.message.chat_id,
+                                text="Apuntado!😉",
+                                parse_mode= ParseMode.MARKDOWN
+                            )
                         except:
-                            print ("Error")
-                        ftp.quit()
+                            bot.send_message(
+                                reply_to_message_id= update.message.message_id,
+                                chat_id=update.message.chat_id,
+                                text="No se ha podido apuntar al partido por un error 😢",
+                                parse_mode= ParseMode.MARKDOWN
+                            )
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Comando para apuntarse a un Partido
@@ -492,7 +500,7 @@ def apuntarBot(bot, update, args):
                         jugadoresET = partido.find("jugadores")
                         n = int(jugadoresET.get('numero'))
                         jugadoresET.set('numero', str(n+1))
-                        if(n == '10'):
+                        if(n == 10):
                             partido.set("estado", 'completo')
                         textmensajeET = partido.find("texto")
                         textmensajeET.text = str(tematicaJugador2)
