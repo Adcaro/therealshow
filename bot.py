@@ -551,7 +551,7 @@ def subirStats(bot, update, args):
                 cursorObj.execute('UPDATE jugador SET nasistencias = nasistencias + {} WHERE nombre IS "{}"'.format(statsaux[1], args[i]))
                 cursorObj.execute('UPDATE jugador SET pganados = pganados + {} WHERE nombre IS "{}"'.format(statsaux[2], args[i]))
                 cursorObj.execute('UPDATE jugador SET pjugados = pjugados + 1 WHERE nombre IS "{}"'.format(args[i]))
-                if(statsaux[2]):
+                if(statsaux[2] == '1'):
                     cursorObj.execute('UPDATE jugador SET racha = racha + 1 WHERE nombre IS "{}"'.format(args[i]))
                 else:
                     cursorObj.execute('UPDATE jugador SET racha = 0 WHERE nombre IS "{}"'.format(args[i]))
