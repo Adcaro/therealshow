@@ -74,15 +74,14 @@ def isRegister(telegramID):
 
 #Descarga la base de datos
 def downloadDB():
-    return 0
-    '''ftp = FTP('ftpupload.net')
+    ftp = FTP('ftpupload.net')
     ftp.login(FTP_USR,FTP_PASS)
     ftp.cwd('htdocs/trs-db')
     try:
         ftp.retrbinary("RETR therealshow.db" ,open('therealshow.db', 'wb').write)
     except:
         logger.error("Error: Couldn't connect to ftp server")
-    ftp.quit()'''
+    ftp.quit()
 
 #Subir la base de datos al servidor (solo en escrituras)
 def uploadDB():
