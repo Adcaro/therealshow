@@ -483,6 +483,7 @@ def graph(bot, update, args):
                 plt.subplots_adjust(bottom=0.5)
                 plt.savefig('tempgraph.png')
                 bot.send_photo(chat_id=update.message.chat_id, photo=open('tempgraph.png', 'rb'), caption = "\n*Máxima diferencia de goles:*\n📂{}\n   🏆Goles: {}   🔝 {}\n*Máxima diferencia en asistencias:*\n📂{}\n   🏅Asist: {}   🔝{}".format(diferenciagoles[0],diferenciagoles[1],diferenciagoles[2],diferenciaasist[0], diferenciaasist[1],diferenciaasist[2]), parse_mode= ParseMode.MARKDOWN)
+                plt.clf()
         #Simple
         else:
             #Abrir conexion sql
@@ -527,6 +528,7 @@ def graph(bot, update, args):
             plt.legend()
             plt.savefig('tempgraph.png')
             bot.send_photo(chat_id=update.message.chat_id, photo=open('tempgraph.png', 'rb'), caption = "\n*Máximos goles en partido:*\n📂{}\n   🏆Goles:{}\n*Máximas asistencias en partido:*\n📂{}\n   🏅Asist:{}".format(mejorgol[0],mejorgol[1],mejorasist[0], mejorasist[1]), parse_mode= ParseMode.MARKDOWN)
+            plt.clf()
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------
