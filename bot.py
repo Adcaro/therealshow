@@ -265,7 +265,7 @@ def mystats(bot, update, args):
         name = ""
         for p in args:
             name = name + p
-        cursorObj.execute('SELECT idtelegram FROM jugador WHERE UPPER(nombre) IS UPPER("{}")'.format(name))
+        cursorObj.execute('SELECT idjugador FROM jugador WHERE UPPER(nombre) IS UPPER("{}")'.format(name))
         jugadorsolicitado = cursorObj.fetchall()
         if( not jugadorsolicitado):
             bot.send_message(
@@ -278,7 +278,7 @@ def mystats(bot, update, args):
         else:
             userid = jugadorsolicitado[0][0]
     #Consulta para sacar las stats de un jugador
-    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pjugados, img FROM jugador WHERE idtelegram IS {}'.format(userid))
+    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pjugados, img FROM jugador WHERE idjugador IS {}'.format(userid))
     #Samos todas las columnas de la consulta
     datosmyStatsJugadores = cursorObj.fetchall()
     #Cerrar la conexion SQL
@@ -287,7 +287,7 @@ def mystats(bot, update, args):
     if( not datosmyStatsJugadores):
         bot.send_message(
                 chat_id=update.message.chat_id,
-                text="❌ Error: No tienes datos sobre tus estadísticas.❌ \n En breve te darán de alta \n {} ID: \t {}".format(update.message.from_user.first_name, userid),
+                text="❌ Error: No tienes datos sobre tus estadísticas.❌ \n En breve te darán de alta \n {} ID: \t {}".format(update.message.from_user.first_name, update.message.from_user.first_name.id),
                 parse_mode= ParseMode.MARKDOWN
             )
     #Si consulta es correcta
