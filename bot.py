@@ -176,8 +176,7 @@ def alta(bot, update, args):
                 cursorObj.execute("INSERT INTO jugador(idtelegram, nombre) VALUES('{}', '{}')".format(update.message.from_user.id, name))
                 con.commit()
             con.close()
-            #TODO Subir la base de datos
-            #uploadDB()
+            uploadDB()
 #Comando para mostrar las stats
 #R
 def stats(bot, update):
