@@ -287,7 +287,7 @@ def mystats(bot, update, args):
     if( not datosmyStatsJugadores):
         bot.send_message(
                 chat_id=update.message.chat_id,
-                text="❌ Error: No tienes datos sobre tus estadísticas.❌ \n En breve te darán de alta \n {} ID: \t {}".format(update.message.from_user.first_name, update.message.from_user.first_name.id),
+                text="❌ Error: No tienes datos sobre tus estadísticas.❌ \n En breve te darán de alta \n {} ID: \t {}".format(update.message.from_user.first_name, update.message.from_user.id),
                 parse_mode= ParseMode.MARKDOWN
             )
     #Si consulta es correcta
