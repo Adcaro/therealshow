@@ -264,7 +264,7 @@ def mystats(bot, update, args):
         name = ""
         for p in args:
             name = name + p
-        cursorObj.execute('SELECT idjugador FROM jugador WHERE UPPER(nombre) IS UPPER("{}")'.format(name))
+        cursorObj.execute('SELECT idtelegram FROM jugador WHERE UPPER(nombre) IS UPPER("{}")'.format(name))
         jugadorsolicitado = cursorObj.fetchall()
         if( not jugadorsolicitado):
             bot.send_message(
