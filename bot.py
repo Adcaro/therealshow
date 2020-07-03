@@ -258,8 +258,6 @@ def mystats(bot, update, args):
     con = sqlite3.connect('therealshow.db')
     #Creamos un cursor
     cursorObj = con.cursor()
-    #Almacenamos el id del usuario
-    userid = update.message.from_user.id
     if(args):
         name = ""
         for p in args:
@@ -276,6 +274,11 @@ def mystats(bot, update, args):
             return 0
         else:
             userid = jugadorsolicitado[0][0]
+    else:
+        cursorObj.execute('SELECT idjugador FROM jugador WHERE idtelegram IS {}'.format(update.message.from_user.id))
+        jugadorsolicitado = cursorObj.fetchall()
+        userid = jugadorsolicitado[0][0]
+    
     #Consulta para sacar las stats de un jugador
     cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pempate, pjugados, img FROM jugador WHERE idjugador IS {}'.format(userid))
     #Samos todas las columnas de la consulta
