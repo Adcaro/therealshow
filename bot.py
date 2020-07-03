@@ -277,7 +277,7 @@ def mystats(bot, update, args):
         else:
             userid = jugadorsolicitado[0][0]
     #Consulta para sacar las stats de un jugador
-    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pjugados, img FROM jugador WHERE idtelegram IS {}'.format(userid))
+    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pempates, pjugados, img FROM jugador WHERE idtelegram IS {}'.format(userid))
     #Samos todas las columnas de la consulta
     datosmyStatsJugadores = cursorObj.fetchall()
     #Cerrar la conexion SQL
@@ -296,7 +296,7 @@ def mystats(bot, update, args):
         downloadCard(j[5])
         #Mostrar mensaje
         senderText = "📊 Stats de {} Season 2 📊\n".format(j[0])
-        bot.send_photo(chat_id=update.message.chat_id, photo=open(j[5], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t🥺 P. Perdidos: " + str(j[4]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[4]))
+        bot.send_photo(chat_id=update.message.chat_id, photo=open(j[5], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t 😑Empates: " + str(j[4] + "\n\t🥺 P. Perdidos: " + str(j[5]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[5]))
 
 #Comando para mostrar los partidos asistidos
 #R
