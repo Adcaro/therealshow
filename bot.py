@@ -277,7 +277,7 @@ def mystats(bot, update, args):
         else:
             userid = jugadorsolicitado[0][0]
     #Consulta para sacar las stats de un jugador
-    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pempates, pjugados, img FROM jugador WHERE idtelegram IS {}'.format(userid))
+    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pempate, pjugados, img FROM jugador WHERE idtelegram IS {}'.format(userid))
     #Samos todas las columnas de la consulta
     datosmyStatsJugadores = cursorObj.fetchall()
     #Cerrar la conexion SQL
