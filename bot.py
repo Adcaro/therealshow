@@ -293,10 +293,10 @@ def mystats(bot, update, args):
     else:
         #Sacar el jugador
         j = datosmyStatsJugadores[0]
-        downloadCard(j[5])
+        downloadCard(j[6])
         #Mostrar mensaje
         senderText = "📊 Stats de {} Season 2 📊\n".format(j[0])
-        bot.send_photo(chat_id=update.message.chat_id, photo=open(j[5], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t 😑Empates: " + str(j[4]) + "\n\t🥺 P. Perdidos: " + str(j[5]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[5]))
+        bot.send_photo(chat_id=update.message.chat_id, photo=open(j[6], 'rb'), caption =senderText + "\n\t🥇 Goles : " + str(j[1]) + "\n\t🥈 Asist: " + str(j[2]) + "\n\t🥉 P. Ganados: " + str(j[3]) + "\n\t 😑Empates: " + str(j[4]) + "\n\t🥺 P. Perdidos: " + str(j[5]-j[3]) + "\n\t⚽ P. Jugados: " + str(j[5]))
 
 #Comando para mostrar los partidos asistidos
 #R
