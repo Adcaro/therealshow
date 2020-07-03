@@ -264,7 +264,7 @@ def mystats(bot, update, args):
         name = ""
         for p in args:
             name = name + p
-        cursorObj.execute('SELECT idtelegram FROM jugador WHERE UPPER(nombre) IS UPPER("{}")'.format(name))
+        cursorObj.execute('SELECT idjugador FROM jugador WHERE UPPER(nombre) IS UPPER("{}")'.format(name))
         jugadorsolicitado = cursorObj.fetchall()
         if( not jugadorsolicitado):
             bot.send_message(
@@ -277,7 +277,7 @@ def mystats(bot, update, args):
         else:
             userid = jugadorsolicitado[0][0]
     #Consulta para sacar las stats de un jugador
-    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pempate, pjugados, img FROM jugador WHERE idtelegram IS {}'.format(userid))
+    cursorObj.execute('SELECT nombre, ngoles, nasistencias, pganados, pempate, pjugados, img FROM jugador WHERE idjugador IS {}'.format(userid))
     #Samos todas las columnas de la consulta
     datosmyStatsJugadores = cursorObj.fetchall()
     #Cerrar la conexion SQL
